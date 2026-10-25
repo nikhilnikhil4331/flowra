@@ -1,6 +1,6 @@
 export type BleedingLevel = 'none' | 'spotting' | 'light' | 'moderate' | 'heavy'
 export type FlowColor = 'bright_red' | 'dark_red' | 'brown' | 'pink' | 'orange_unusual' | 'other_unsure'
-export type Mood = 'happy' | 'calm' | 'irritable' | 'anxious' | 'sad' | 'low'
+export type Mood = 'happy' | 'calm' | 'irritable' | 'anxious' | 'sad' | 'low' | 'confused' | 'sleepy'
 export type Symptom =
   | 'cramps'
   | 'headache'

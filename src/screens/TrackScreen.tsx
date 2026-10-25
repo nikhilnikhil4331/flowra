@@ -1,15 +1,18 @@
-import { AlertTriangle, BatteryMedium, Brain, Check, ChevronRight, CircleHelp, Droplet, HeartPulse, Lightbulb, Moon, NotebookPen, Pill, Plus, Smile, Sparkles, Thermometer, Waves, X } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { AlertTriangle, ArrowLeft, BatteryMedium, Brain, Check, ChevronRight, CircleHelp, Droplet, HeartPulse, Lightbulb, Moon, NotebookPen, Smile, Sparkles, Thermometer, Trash2, Waves } from 'lucide-react'
+import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react'
 import type { DailyLog, Mood, PainLocation, Symptom } from '../domain/types'
 import { todayKey } from '../domain/cycle'
 import { buildDailySummary, evaluateSafety } from '../domain/safety'
-import { Button, Card, Notice, Pill as StatusPill, Toggle } from '../components/ui'
+import { Button, Card, Notice, Toggle } from '../components/ui'
+import { Chibi } from '../components/MyfloArt'
 import { createId, nowIso } from '../lib/store'
 
 interface TrackScreenProps {
   logs: DailyLog[]
   onSave: (log: DailyLog) => void
+  onDelete: (id: string) => void
   onOpenFlowGuide: () => void
+  onBack: () => void
 }
 
 type FormState = Omit<DailyLog, 'id' | 'createdAt' | 'updatedAt'>
@@ -53,13 +56,15 @@ function fromLog(log: DailyLog | undefined, date: string): FormState {
   return rest
 }
 
-const moods: { id: Mood; label: string; icon: string }[] = [
-  { id: 'happy', label: 'Happy', icon: '☺' },
-  { id: 'calm', label: 'Calm', icon: '◌' },
-  { id: 'irritable', label: 'Irritable', icon: '⌁' },
-  { id: 'anxious', label: 'Anxious', icon: '☁' },
-  { id: 'sad', label: 'Sad', icon: '☹' },
-  { id: 'low', label: 'Low mood', icon: '◒' },
+const moods: { id: Mood; label: string }[] = [
+  { id: 'calm', label: 'Calm' },
+  { id: 'happy', label: 'Happy' },
+  { id: 'anxious', label: 'Anxious' },
+  { id: 'sad', label: 'Sad' },
+  { id: 'low', label: 'Low mood' },
+  { id: 'confused', label: 'Confused' },
+  { id: 'irritable', label: 'Irritable' },
+  { id: 'sleepy', label: 'Sleepy' },
 ]
 
 const symptoms: { id: Symptom; label: string; icon: string }[] = [
@@ -85,16 +90,16 @@ const painLocations: { id: PainLocation; label: string }[] = [
   { id: 'other', label: 'Other' },
 ]
 
-function ScoreSlider({ label, helper, value, onChange, lowLabel, highLabel, icon }: { label: string; helper: string; value: number; onChange: (value: number) => void; lowLabel: string; highLabel: string; icon: React.ReactNode }) {
+function ScoreSlider({ label, helper, value, onChange, lowLabel, highLabel, icon }: { label: string; helper: string; value: number; onChange: (value: number) => void; lowLabel: string; highLabel: string; icon: ReactNode }) {
   const id = `score-${label.toLowerCase().replace(/\s/g, '-')}`
-  return <div className="score-slider"><div className="score-slider__header"><div><span className="score-slider__icon">{icon}</span><div><h3>{label}</h3><p>{helper}</p></div></div><strong>{value}<small>/10</small></strong></div><input id={id} type="range" min="0" max="10" step="1" value={value} onChange={(event) => onChange(Number(event.target.value))} aria-label={`${label}: ${value} out of 10`} style={{ '--range-progress': `${value * 10}%` } as React.CSSProperties} /><div className="slider-labels"><span>{lowLabel}</span><span>{highLabel}</span></div></div>
+  return <div className="score-slider"><div className="score-slider__header"><div><span className="score-slider__icon">{icon}</span><div><h3>{label}</h3><p>{helper}</p></div></div><strong>{value}<small>/10</small></strong></div><input id={id} type="range" min="0" max="10" step="1" value={value} onChange={(event) => onChange(Number(event.target.value))} aria-label={`${label}: ${value} out of 10`} style={{ '--range-progress': `${value * 10}%` } as CSSProperties} /><div className="slider-labels"><span>{lowLabel}</span><span>{highLabel}</span></div></div>
 }
 
-function ToggleChip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+function ToggleChip({ active, onClick, children }: { active: boolean; onClick: () => void; children: ReactNode }) {
   return <button type="button" className={`choice-chip ${active ? 'is-selected' : ''}`} aria-pressed={active} onClick={onClick}>{active && <Check size={14} />}{children}</button>
 }
 
-export function TrackScreen({ logs, onSave, onOpenFlowGuide }: TrackScreenProps) {
+export function TrackScreen({ logs, onSave, onDelete, onOpenFlowGuide, onBack }: TrackScreenProps) {
   const today = todayKey()
   const [date, setDate] = useState(today)
   const [form, setForm] = useState<FormState>(() => fromLog(logs.find((entry) => entry.date === today), today))
@@ -119,19 +124,22 @@ export function TrackScreen({ logs, onSave, onOpenFlowGuide }: TrackScreenProps)
     window.setTimeout(() => setSaved(false), 5000)
   }
 
-  return <div className="screen screen--track">
-    <header className="screen-header track-header"><div><p className="eyebrow">My Body Today</p><h1>How are you feeling?</h1><p className="subtitle">A private scorecard for the details that matter to you.</p></div><StatusPill tone="lavender">{existing ? 'Editing saved log' : 'New check-in'}</StatusPill></header>
+  return <div className="screen screen--track myflo-track-screen">
+    <header className="myflo-page-header myflo-track-header"><button className="myflo-back-button" onClick={onBack} aria-label="Back to home"><ArrowLeft size={20} /></button><h1>Log Symptoms</h1><button className="myflo-save-circle" onClick={save} aria-label="Save daily log"><Check size={21} /></button></header>
+    <p className="myflo-track-prompt">How are you feeling today?</p>
 
-    <Card className="date-switcher"><button type="button" aria-label="Previous day" onClick={() => { const current = new Date(`${date}T00:00:00Z`); current.setUTCDate(current.getUTCDate() - 1); setDate(current.toISOString().slice(0, 10)) }}><ChevronRight size={20} className="flip-horizontal" /></button><label><span>Check-in date</span><input type="date" value={date} max={today} onChange={(event) => setDate(event.target.value)} /></label><button type="button" aria-label="Next day" disabled={date >= today} onClick={() => { const current = new Date(`${date}T00:00:00Z`); current.setUTCDate(current.getUTCDate() + 1); setDate(current.toISOString().slice(0, 10)) }}><ChevronRight size={20} /></button></Card>
+    <Card className="date-switcher myflo-date-switcher"><button type="button" aria-label="Previous day" onClick={() => { const current = new Date(`${date}T00:00:00Z`); current.setUTCDate(current.getUTCDate() - 1); setDate(current.toISOString().slice(0, 10)) }}><ChevronRight size={20} className="flip-horizontal" /></button><label><span>Check-in date</span><input type="date" value={date} max={today} onChange={(event) => setDate(event.target.value)} /></label><button type="button" aria-label="Next day" disabled={date >= today} onClick={() => { const current = new Date(`${date}T00:00:00Z`); current.setUTCDate(current.getUTCDate() + 1); setDate(current.toISOString().slice(0, 10)) }}><ChevronRight size={20} /></button></Card>
 
     {safetyAlerts.map((alert) => <Notice key={alert.id} tone={alert.severity === 'urgent' ? 'urgent' : alert.severity === 'soon' ? 'warning' : 'info'}><div className="safety-notice"><AlertTriangle size={20} /><div><strong>{alert.title}</strong><span>{alert.message}</span><small>{alert.action}</small></div></div></Notice>)}
 
     <Card className="mood-card">
       <div className="card-title-row"><div><h2>How are you feeling emotionally?</h2><p>Choose the closest fit. You can leave this blank.</p></div><Smile size={22} /></div>
       <div className="mood-options" role="group" aria-label="Mood">
-        {moods.map((mood) => <button type="button" key={mood.id} onClick={() => update('mood', form.mood === mood.id ? undefined : mood.id)} aria-pressed={form.mood === mood.id} className={`mood-option ${form.mood === mood.id ? 'is-selected' : ''}`}><span>{mood.icon}</span>{mood.label}</button>)}
+        {moods.map((mood) => <button type="button" key={mood.id} onClick={() => update('mood', form.mood === mood.id ? undefined : mood.id)} aria-pressed={form.mood === mood.id} className={`mood-option ${form.mood === mood.id ? 'is-selected' : ''}`}><Chibi mood={mood.id} size="xs" />{mood.label}</button>)}
       </div>
     </Card>
+
+    <Card className="symptoms-card"><div className="card-title-row"><div><h2>Physical Symptoms</h2><p>Select all that apply.</p></div><Sparkles size={21} /></div><div className="symptom-grid">{symptoms.map((symptom) => <button type="button" key={symptom.id} onClick={() => selectedSymptoms(symptom.id)} aria-pressed={form.symptoms.includes(symptom.id)} className={`symptom-option ${form.symptoms.includes(symptom.id) ? 'is-selected' : ''}`}><Chibi mood={symptom.id === 'cramps' ? 'anxious' : 'calm'} size="xs" />{symptom.label}</button>)}</div></Card>
 
     <div className="track-grid">
       <Card className="pain-card">
@@ -148,9 +156,7 @@ export function TrackScreen({ logs, onSave, onOpenFlowGuide }: TrackScreenProps)
       </Card>
     </div>
 
-    <Card className="symptoms-card"><div className="card-title-row"><div><h2>Physical symptoms</h2><p>Select all that apply. No selection means no symptoms were recorded.</p></div><Sparkles size={21} /></div><div className="symptom-grid">{symptoms.map((symptom) => <button type="button" key={symptom.id} onClick={() => selectedSymptoms(symptom.id)} aria-pressed={form.symptoms.includes(symptom.id)} className={`symptom-option ${form.symptoms.includes(symptom.id) ? 'is-selected' : ''}`}><span>{symptom.icon}</span>{symptom.label}</button>)}</div></Card>
-
-    <div className="scores-grid">
+        <div className="scores-grid">
       <Card><ScoreSlider label="Bloating" helper="Fullness, gas, or discomfort" value={form.bloatingScore} onChange={(value) => update('bloatingScore', value)} lowLabel="None" highLabel="Very uncomfortable" icon={<Waves size={20} />} /></Card>
       <Card><ScoreSlider label="Stress" helper="0 = very relaxed · 10 = extremely stressed" value={form.stressScore} onChange={(value) => update('stressScore', value)} lowLabel="Relaxed" highLabel="Extremely stressed" icon={<Brain size={20} />} /></Card>
       <Card><ScoreSlider label="Energy" helper="How energetic do you feel?" value={form.energyScore} onChange={(value) => update('energyScore', value)} lowLabel="Low energy" highLabel="Very energetic" icon={<BatteryMedium size={20} />} /></Card>
@@ -163,6 +169,6 @@ export function TrackScreen({ logs, onSave, onOpenFlowGuide }: TrackScreenProps)
 
     <Card className="notes-card"><div className="card-title-row"><div><h2>Anything else to remember?</h2><p>Optional private note · up to 500 characters</p></div><NotebookPen size={21} /></div><textarea value={form.notes} onChange={(event) => update('notes', event.target.value.slice(0, 500))} rows={4} maxLength={500} placeholder="How has today felt? What seemed to help?" /><span className="character-count">{form.notes?.length ?? 0}/500</span></Card>
 
-    <Card className="save-log-card"><div><span className="metric-icon metric-icon--rose"><Lightbulb size={20} /></span><div><h2>Your daily summary</h2><p>{buildDailySummary(form, logs.filter((entry) => entry.date !== date))}</p></div></div><div><p className="fine-print">Saving records exactly what you entered. It does not infer a diagnosis or send data to an AI service.</p>{saved && <Notice tone="success"><Check size={17} /> Your private daily log was saved.</Notice>}<Button onClick={save}><Check size={18} /> {existing ? 'Update daily log' : 'Save daily log'}</Button></div></Card>
+    <Card className="save-log-card"><div><span className="metric-icon metric-icon--rose"><Lightbulb size={20} /></span><div><h2>Your daily summary</h2><p>{buildDailySummary(form, logs.filter((entry) => entry.date !== date))}</p></div></div><div><p className="fine-print">Saving records exactly what you entered. It does not infer a diagnosis or send data to an AI service.</p>{saved && <Notice tone="success"><Check size={17} /> Your private daily log was saved.</Notice>}<Button onClick={save}><Check size={18} /> {existing ? 'Update daily log' : 'Save daily log'}</Button>{existing && <Button variant="ghost" className="myflo-delete-log" onClick={() => { if (window.confirm('Delete this daily check-in? This cannot be undone.')) { onDelete(existing.id); onBack() } }}><Trash2 size={15} /> Delete this log</Button>}</div></Card>
   </div>
 }

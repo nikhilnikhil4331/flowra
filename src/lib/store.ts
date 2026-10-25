@@ -74,7 +74,8 @@ export function persistAppData(data: AppData): boolean {
   }
 }
 
-export function useFlowraStore() {
+// Keeps the legacy storage key so existing private records remain available after the Myflo rebrand.
+export function useMyfloStore() {
   const [data, setData] = useState<AppData>(() => loadAppData())
   const [storageError, setStorageError] = useState(false)
 
@@ -91,6 +92,10 @@ export function useFlowraStore() {
       ...current,
       dailyLogs: [log, ...current.dailyLogs.filter((item) => item.date !== log.date)].sort((a, b) => b.date.localeCompare(a.date)),
     }))
+  }, [update])
+
+  const deleteLog = useCallback((id: string) => {
+    update((current) => ({ ...current, dailyLogs: current.dailyLogs.filter((item) => item.id !== id) }))
   }, [update])
 
   const upsertCycle = useCallback((cycle: CycleEntry) => {
@@ -140,6 +145,7 @@ export function useFlowraStore() {
     storageError,
     update,
     upsertLog,
+    deleteLog,
     upsertCycle,
     deleteCycle,
     addMeal,
@@ -159,7 +165,7 @@ export function exportData(data: AppData): void {
   const url = URL.createObjectURL(blob)
   const anchor = document.createElement('a')
   anchor.href = url
-  anchor.download = `flowra-export-${new Date().toISOString().slice(0, 10)}.json`
+  anchor.download = `myflo-export-${new Date().toISOString().slice(0, 10)}.json`
   document.body.appendChild(anchor)
   anchor.click()
   anchor.remove()

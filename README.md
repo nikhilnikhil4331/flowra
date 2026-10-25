@@ -1,20 +1,20 @@
-# Flowra
+# Myflo
 
-A privacy-first, safety-aware women’s health companion built as a responsive React + TypeScript application.
+A privacy-first, safety-aware women’s health companion built as a mobile-first React + TypeScript application. The primary visual treatment follows the supplied Myflo reference: a warm off-white phone canvas, lavender presentation frame, floral line art, compact pastel cards, a circular cycle widget, and a five-item bottom navigation with a centre quick-action button.
 
-> **Important:** Flowra provides tracking and educational information. It does not diagnose conditions, prescribe medicine, assess emergencies, or replace a qualified clinician. Severe, sudden, worsening, or concerning symptoms should be evaluated by an appropriate medical professional.
+> **Important:** Myflo provides tracking and educational information. It does not diagnose conditions, prescribe medicine, assess emergencies, or replace a qualified clinician. Severe, sudden, worsening, or concerning symptoms should be evaluated by an appropriate medical professional.
 
 ## Initial repository audit
 
 The supplied repository contained only `README.md` at the initial commit. There was no frontend, API, auth provider, database schema, component library, dependency manifest, or existing functionality to preserve.
 
-A connected Supabase account exposes a project named **NikNote**, which is not clearly a Flowra project. It was deliberately **not modified**. The repository includes a new Flowra migration ready to apply to a dedicated project instead.
+A connected Supabase account exposes a project named **NikNote**, which is not clearly a Myflo project. It was deliberately **not modified**. The repository includes a new Myflo migration ready to apply to a dedicated project instead.
 
 ## What is implemented
 
 ### Core app / Stage 1
 
-- Premium responsive Flowra design system: warm ivory, blush, rose, sage, lavender, accessible focus states, restrained botanical CSS art, reduced-motion support, desktop navigation and mobile bottom navigation.
+- Premium Myflo mobile design system: warm ivory, blush, rose, sage, lavender, accessible focus states, restrained botanical CSS art, reduced-motion support, a centred phone shell on larger screens, and the reference-style mobile bottom navigation.
 - Three-step onboarding with cycle irregularity, optional current period entry, private-local-mode disclosure, and opt-in future AI-processing consent.
 - **Home dashboard** with current cycle day, conservative phase display, estimated period confidence, today’s scorecard, hydration, meal-log status, and contextual care guidance.
 - **Cycle calendar** with:
@@ -43,7 +43,7 @@ A connected Supabase account exposes a project named **NikNote**, which is not c
 - Versioned browser persistence (`localStorage`) for private local mode with load/error handling.
 - No health data is transmitted by this build.
 - No client-side API keys are present.
-- A Supabase-ready relational schema and RLS policies are in [`supabase/migrations/202610250001_flowra_core.sql`](./supabase/migrations/202610250001_flowra_core.sql).
+- A Supabase-ready relational schema and RLS policies are in [`supabase/migrations/202610250001_myflo_core.sql`](./supabase/migrations/202610250001_myflo_core.sql).
 - The migration scopes every health-data table to `auth.uid()`, adds ownership RLS policies, user/date indexes, data export/deletion support, timestamps, validation constraints, and an auditable place for future AI insights.
 
 ## Deliberately not represented as complete
@@ -64,7 +64,7 @@ src/
   domain/           cycle prediction, safety rules, nutrition estimate logic + tests
   lib/              local persistence and in-tab reminder scheduler
   screens/          Home, Calendar, Track, Insights, Flow Guide, More
-supabase/migrations/ Flowra security-first schema and RLS migration
+supabase/migrations/ Myflo security-first schema and RLS migration
 ```
 
 ## Run locally
@@ -102,8 +102,8 @@ Never put sensitive provider keys in `VITE_*` variables.
 
 ## Database deployment checklist
 
-1. Create or identify a **dedicated Flowra Supabase project**; do not repurpose an unrelated app’s database.
-2. Review [`supabase/migrations/202610250001_flowra_core.sql`](./supabase/migrations/202610250001_flowra_core.sql) with a database/security owner.
+1. Create or identify a **dedicated Myflo Supabase project**; do not repurpose an unrelated app’s database.
+2. Review [`supabase/migrations/202610250001_myflo_core.sql`](./supabase/migrations/202610250001_myflo_core.sql) with a database/security owner.
 3. Apply the migration through controlled deployment.
 4. Configure Auth, redirect URLs, email policy, and a server-side account deletion endpoint.
 5. Add a Supabase repository adapter and replace local-only persistence only after integration tests verify RLS isolation across two accounts.

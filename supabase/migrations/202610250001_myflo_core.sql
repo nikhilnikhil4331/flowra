@@ -1,13 +1,13 @@
--- Flowra core schema
--- Apply this only to the Supabase project intended for Flowra.
+-- Myflo core schema
+-- Apply this only to the Supabase project intended for Myflo.
 -- This migration is intentionally not applied to any unrelated project.
 
 create extension if not exists pgcrypto;
 
-create type public.flowra_bleeding_level as enum ('none', 'spotting', 'light', 'moderate', 'heavy');
-create type public.flowra_flow_color as enum ('bright_red', 'dark_red', 'brown', 'pink', 'orange_unusual', 'other_unsure');
-create type public.flowra_mood as enum ('happy', 'calm', 'irritable', 'anxious', 'sad', 'low');
-create type public.flowra_reminder_type as enum ('daily_log', 'water', 'nutrition', 'sleep', 'period', 'medication', 'appointment');
+create type public.myflo_bleeding_level as enum ('none', 'spotting', 'light', 'moderate', 'heavy');
+create type public.myflo_flow_color as enum ('bright_red', 'dark_red', 'brown', 'pink', 'orange_unusual', 'other_unsure');
+create type public.myflo_mood as enum ('happy', 'calm', 'irritable', 'anxious', 'sad', 'low', 'confused', 'sleepy');
+create type public.myflo_reminder_type as enum ('daily_log', 'water', 'nutrition', 'sleep', 'period', 'medication', 'appointment');
 
 create table public.profiles (
   user_id uuid primary key references auth.users(id) on delete cascade,
@@ -53,8 +53,8 @@ create table public.daily_logs (
   pain_interferes boolean not null default false,
   medication_taken text check (char_length(medication_taken) <= 80),
   medication_helped text check (medication_helped in ('yes', 'no', 'unsure')),
-  bleeding public.flowra_bleeding_level not null default 'none',
-  flow_color public.flowra_flow_color,
+  bleeding public.myflo_bleeding_level not null default 'none',
+  flow_color public.myflo_flow_color,
   flow_consistency text check (char_length(flow_consistency) <= 140),
   products_changed text check (products_changed in ('not_applicable', 'less_than_2h', '2_to_4h', '4_to_8h', 'more_than_8h')),
   fully_soaked boolean not null default false,
@@ -67,7 +67,7 @@ create table public.daily_logs (
   bloating_score smallint not null default 0 check (bloating_score between 0 and 10),
   stress_score smallint not null default 0 check (stress_score between 0 and 10),
   energy_score smallint not null default 5 check (energy_score between 0 and 10),
-  mood public.flowra_mood,
+  mood public.myflo_mood,
   symptoms text[] not null default '{}',
   sleep_hours numeric(4,1) check (sleep_hours between 0 and 24),
   sleep_quality smallint check (sleep_quality between 0 and 10),
@@ -111,7 +111,7 @@ create index medication_records_user_taken_idx on public.medication_records (use
 create table public.reminders (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
-  reminder_type public.flowra_reminder_type not null,
+  reminder_type public.myflo_reminder_type not null,
   title text not null check (char_length(title) between 1 and 80),
   enabled boolean not null default true,
   local_time time not null,
@@ -196,7 +196,7 @@ create policy "Users manage their own generated insights" on public.ai_insights 
 -- Privacy support: authenticated clients can remove their health data while retaining
 -- their account. Account deletion itself requires a separately protected server-side
 -- administrative operation; never expose a service-role key to the client.
-create or replace function public.delete_my_flowra_data()
+create or replace function public.delete_myflo_data()
 returns void
 language plpgsql
 security invoker

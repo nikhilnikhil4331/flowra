@@ -1,13 +1,15 @@
 import { AlertTriangle, ArrowRight, Bot, Camera, ChevronRight, CircleHelp, Droplets, HeartPulse, ImagePlus, Info, Leaf, LoaderCircle, MessageCircleHeart, Plus, Salad, Send, Sparkles, Trash2, TrendingUp, Utensils, X } from 'lucide-react'
-import { useMemo, useState, type ChangeEvent } from 'react'
+import { useEffect, useMemo, useState, type ChangeEvent } from 'react'
 import type { AppData, CyclePrediction, MealEntry, MealNutrients } from '../domain/types'
-import { getCurrentCycleDay, getCyclePhase, humanDate, todayKey } from '../domain/cycle'
+import { daysBetween, humanDate, todayKey } from '../domain/cycle'
 import { evaluateSafety } from '../domain/safety'
 import { emptyNutrients, findFoodReference, formatNutrient, scaleNutrients, totalNutrients } from '../domain/nutrition'
 import { Button, Card, EmptyState, Notice, Pill, ProgressBar } from '../components/ui'
+import { Chibi } from '../components/MyfloArt'
 import { createId, nowIso } from '../lib/store'
 
-type InsightTab = 'overview' | 'nutrition' | 'companion'
+type InsightTab = 'history' | 'nutrition' | 'companion'
+type HistoryTab = 'cycle' | 'symptoms' | 'mood'
 
 interface InsightsScreenProps {
   data: AppData
@@ -15,6 +17,8 @@ interface InsightsScreenProps {
   onAddMeal: (meal: MealEntry) => void
   onDeleteMeal: (id: string) => void
   onOpenTrack: () => void
+  initialScreen?: InsightTab
+  openMealRequest?: number
 }
 
 const nutrientFields: { key: keyof MealNutrients; label: string; unit: string; step: string }[] = [
@@ -38,57 +42,68 @@ function formatMood(value?: string) {
   return value ? value.replace('_', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase()) : 'Not recorded'
 }
 
-export function InsightsScreen({ data, prediction, onAddMeal, onDeleteMeal, onOpenTrack }: InsightsScreenProps) {
-  const [tab, setTab] = useState<InsightTab>('overview')
+export function InsightsScreen({ data, prediction, onAddMeal, onDeleteMeal, onOpenTrack, initialScreen = 'history', openMealRequest = 0 }: InsightsScreenProps) {
+  const [tab, setTab] = useState<InsightTab>(initialScreen)
   const today = todayKey()
   const todayLog = data.dailyLogs.find((entry) => entry.date === today)
   const alerts = todayLog ? evaluateSafety(todayLog) : []
 
-  return <div className="screen screen--insights">
-    <header className="screen-header"><div><p className="eyebrow">Patterns, not assumptions</p><h1>Health & insights</h1><p className="subtitle">Your records can reveal useful patterns. They cannot prove a cause or replace medical care.</p></div><span className="screen-leaf"><Leaf size={27} /></span></header>
-    <div className="segment-control" role="tablist" aria-label="Insights sections"><button role="tab" aria-selected={tab === 'overview'} className={tab === 'overview' ? 'is-selected' : ''} onClick={() => setTab('overview')}>This cycle</button><button role="tab" aria-selected={tab === 'nutrition'} className={tab === 'nutrition' ? 'is-selected' : ''} onClick={() => setTab('nutrition')}>Nutrition</button><button role="tab" aria-selected={tab === 'companion'} className={tab === 'companion' ? 'is-selected' : ''} onClick={() => setTab('companion')}>Companion</button></div>
+  useEffect(() => setTab(initialScreen), [initialScreen])
+
+  return <div className="screen screen--insights myflo-insights-screen">
+    <header className="myflo-page-header myflo-insights-header"><span className="myflo-back-button myflo-back-button--passive"><Leaf size={19} /></span><h1>{tab === 'history' ? 'Cycle History' : tab === 'nutrition' ? 'Food Scanner' : 'Myflo Companion'}</h1><button className="myflo-insights-switch" onClick={() => setTab((current) => current === 'history' ? 'nutrition' : current === 'nutrition' ? 'companion' : 'history')} aria-label="Switch insight section">•••</button></header>
+    {tab !== 'history' && <div className="myflo-mini-tabs"><button onClick={() => setTab('history')}>History</button><button className={tab === 'nutrition' ? 'is-selected' : ''} onClick={() => setTab('nutrition')}>Food</button><button className={tab === 'companion' ? 'is-selected' : ''} onClick={() => setTab('companion')}>Companion</button></div>}
     {alerts.length > 0 && <Notice tone={alerts.some((alert) => alert.severity === 'urgent') ? 'urgent' : 'warning'}><AlertTriangle size={19} /><div><strong>{alerts[0].title}</strong><span>{alerts[0].action}</span></div></Notice>}
-    {tab === 'overview' && <CycleOverview data={data} prediction={prediction} onOpenTrack={onOpenTrack} />}
-    {tab === 'nutrition' && <NutritionDashboard data={data} onAddMeal={onAddMeal} onDeleteMeal={onDeleteMeal} />}
+    {tab === 'history' && <CycleHistory data={data} prediction={prediction} onOpenTrack={onOpenTrack} />}
+    {tab === 'nutrition' && <NutritionDashboard data={data} onAddMeal={onAddMeal} onDeleteMeal={onDeleteMeal} openMealRequest={openMealRequest} />}
     {tab === 'companion' && <Companion data={data} />}
   </div>
 }
 
-function CycleOverview({ data, prediction, onOpenTrack }: { data: AppData; prediction: CyclePrediction; onOpenTrack: () => void }) {
-  const today = todayKey()
-  const cycleDay = getCurrentCycleDay(data.cycles, today)
-  const phase = getCyclePhase(cycleDay, prediction)
-  const recentLogs = [...data.dailyLogs].sort((a, b) => a.date.localeCompare(b.date)).slice(-8)
-  const symptomsLogged = data.dailyLogs.slice(0, 12)
-  const bloatingCount = symptomsLogged.filter((log) => log.symptoms.includes('bloating') || log.bloatingScore >= 5).length
-  const fatigueCount = symptomsLogged.filter((log) => log.symptoms.includes('fatigue')).length
-  const highStressCount = symptomsLogged.filter((log) => log.stressScore >= 7).length
-  const maxPoint = Math.max(10, ...recentLogs.flatMap((log) => [log.painScore, log.bloatingScore, log.stressScore]))
+function CycleHistory({ data, prediction, onOpenTrack }: { data: AppData; prediction: CyclePrediction; onOpenTrack: () => void }) {
+  const [active, setActive] = useState<HistoryTab>('cycle')
+  const cycles = [...data.cycles].sort((a, b) => a.startDate.localeCompare(b.startDate))
+  const recorded = cycles.slice(1).map((entry, index) => ({
+    entry,
+    length: daysBetween(cycles[index].startDate, entry.startDate),
+    periodLength: entry.endDate ? daysBetween(entry.startDate, entry.endDate) + 1 : undefined,
+  })).filter((item) => item.length >= 15 && item.length <= 90)
+  const recent = [...recorded].slice(-5).reverse()
+  const average = recorded.length ? Math.round(recorded.reduce((total, item) => total + item.length, 0) / recorded.length) : undefined
+  const shortest = recorded.length ? Math.min(...recorded.map((item) => item.length)) : undefined
+  const longest = recorded.length ? Math.max(...recorded.map((item) => item.length)) : undefined
+  const maxChart = Math.max(35, ...(recorded.map((item) => item.length)))
+  const chartPoints = recorded.map((item, index) => {
+    const x = recorded.length === 1 ? 50 : 8 + (index / (recorded.length - 1)) * 84
+    const y = 88 - ((item.length - 15) / Math.max(1, maxChart - 15)) * 74
+    return `${x},${Math.max(10, Math.min(88, y))}`
+  }).join(' ')
+  const symptomCounts = data.dailyLogs.reduce<Record<string, number>>((counts, log) => {
+    log.symptoms.forEach((symptom) => { counts[symptom] = (counts[symptom] ?? 0) + 1 })
+    return counts
+  }, {})
+  const moodCounts = data.dailyLogs.reduce<Record<string, number>>((counts, log) => {
+    if (log.mood) counts[log.mood] = (counts[log.mood] ?? 0) + 1
+    return counts
+  }, {})
+  const commonSymptoms = Object.entries(symptomCounts).sort((a, b) => b[1] - a[1]).slice(0, 4)
+  const commonMoods = Object.entries(moodCounts).sort((a, b) => b[1] - a[1]).slice(0, 4)
 
   return <>
-    <section className="insight-overview-grid">
-      <Card className="cycle-overview-card"><div className="card-title-row"><div><p className="eyebrow">Cycle overview</p><h2>{cycleDay ? `Day ${cycleDay}` : 'No current cycle yet'}</h2></div><Pill tone={prediction.confidence === 'higher' ? 'sage' : prediction.confidence === 'moderate' ? 'lavender' : 'ivory'}>{prediction.confidence} confidence</Pill></div><div className="overview-numbers"><div><span>Current phase</span><strong>{phase}</strong></div><div><span>Typical cycle</span><strong>{prediction.averageCycleLength ? `${prediction.averageCycleLength} days` : '—'}</strong></div><div><span>Next estimate</span><strong>{prediction.nextPeriodStart ? humanDate(prediction.nextPeriodStart) : 'Need history'}</strong></div></div><p className="fine-print">{prediction.nextPeriodStart ? `Estimate based on ${prediction.basis} recorded interval${prediction.basis === 1 ? '' : 's'}.` : 'Log two period starts to create a personal estimate.'} Cycle phase and ovulation estimates are educational only.</p></Card>
-      <Card className="check-in-prompt"><span className="metric-icon metric-icon--lavender"><HeartPulse size={20} /></span><p className="eyebrow">Today’s check-in</p><h2>{data.dailyLogs.some((log) => log.date === today) ? 'Your log is saved.' : 'A small check-in can help.'}</h2><p>{data.dailyLogs.some((log) => log.date === today) ? 'Update it whenever your symptoms change.' : 'Pain, energy, stress, sleep, and flow are all optional.'}</p><Button variant="secondary" onClick={onOpenTrack}>{data.dailyLogs.some((log) => log.date === today) ? 'Review today’s log' : 'Log today'} <ArrowRight size={17} /></Button></Card>
-    </section>
-
-    <section className="section-heading"><div><p className="eyebrow">Your recorded trend</p><h2>Pain, bloating & stress</h2></div><Pill tone="ivory">Last {recentLogs.length || 0} check-ins</Pill></section>
-    <Card className="trend-card">{recentLogs.length >= 2 ? <><div className="trend-key"><span><i className="trend-key__dot trend-key__dot--pain" />Pain</span><span><i className="trend-key__dot trend-key__dot--bloating" />Bloating</span><span><i className="trend-key__dot trend-key__dot--stress" />Stress</span></div><div className="line-chart" aria-label="Trend chart of recorded scores">{recentLogs.map((log) => <div className="line-chart__group" key={log.id}><div className="line-chart__columns"><i className="chart-bar chart-bar--pain" style={{ height: `${Math.max(4, (log.painScore / maxPoint) * 100)}%` }} title={`Pain ${log.painScore}/10`} /><i className="chart-bar chart-bar--bloating" style={{ height: `${Math.max(4, (log.bloatingScore / maxPoint) * 100)}%` }} title={`Bloating ${log.bloatingScore}/10`} /><i className="chart-bar chart-bar--stress" style={{ height: `${Math.max(4, (log.stressScore / maxPoint) * 100)}%` }} title={`Stress ${log.stressScore}/10`} /></div><span>{humanDate(log.date, { day: 'numeric', month: 'short' })}</span></div>)}</div><p className="fine-print">This chart only describes your entries. It does not establish why scores changed.</p></> : <EmptyState icon={<TrendingUp size={25} />} title="More check-ins will make a trend" description="Save at least two daily logs to compare your own recorded scores over time." action={<Button variant="secondary" onClick={onOpenTrack}>Add a check-in</Button>} />}</Card>
-
-    <section className="section-heading"><div><p className="eyebrow">Observed patterns</p><h2>What your logs show</h2></div></section>
-    <div className="patterns-grid">
-      <PatternCard icon={<Droplets size={20} />} label="Bloating" value={bloatingCount} total={symptomsLogged.length} description={symptomsLogged.length ? `Recorded in ${bloatingCount} of your last ${symptomsLogged.length} check-ins.` : 'No check-ins to compare yet.'} tone="rose" />
-      <PatternCard icon={<Sparkles size={20} />} label="Fatigue" value={fatigueCount} total={symptomsLogged.length} description={symptomsLogged.length ? `Recorded in ${fatigueCount} of your last ${symptomsLogged.length} check-ins.` : 'No check-ins to compare yet.'} tone="lavender" />
-      <PatternCard icon={<HeartPulse size={20} />} label="High stress" value={highStressCount} total={symptomsLogged.length} description={symptomsLogged.length ? `Stress of 7 or higher in ${highStressCount} of your last ${symptomsLogged.length} check-ins.` : 'No check-ins to compare yet.'} tone="sage" />
-    </div>
-    <Notice tone="info"><Info size={19} /><div><strong>Observed, not proven.</strong><span>Repeated entries can be useful to discuss with a clinician. They do not prove that sleep, food, stress, or a cycle phase caused a symptom.</span></div></Notice>
+    <div className="myflo-history-tabs" role="tablist" aria-label="Cycle history sections"><button className={active === 'cycle' ? 'is-selected' : ''} onClick={() => setActive('cycle')} role="tab" aria-selected={active === 'cycle'}>Cycle Length</button><button className={active === 'symptoms' ? 'is-selected' : ''} onClick={() => setActive('symptoms')} role="tab" aria-selected={active === 'symptoms'}>Symptoms</button><button className={active === 'mood' ? 'is-selected' : ''} onClick={() => setActive('mood')} role="tab" aria-selected={active === 'mood'}>Mood</button></div>
+    {active === 'cycle' && <>
+      <Card className="myflo-history-summary"><div><p>{recorded.length ? `Your recorded cycle length ranges from ${shortest}–${longest} days.` : 'Your cycle history will appear here as you record period starts.'}</p><small>{recorded.length ? `${recorded.length} recorded interval${recorded.length === 1 ? '' : 's'} · individual cycles can vary` : 'Myflo never assumes a fixed 28-day cycle.'}</small></div><Chibi mood={data.profile.cycleIsIrregular ? 'confused' : 'happy'} size="md" /></Card>
+      <Card className="myflo-history-chart-card"><div className="myflo-history-chart-title"><div><h2>Cycle Length</h2><small>{average ? `Average ${average} days` : 'Need two recorded starts'}</small></div>{data.profile.cycleIsIrregular && <Pill tone="lavender">Variation noted</Pill>}</div>{recorded.length >= 2 ? <><svg className="myflo-cycle-line-chart" viewBox="0 0 100 100" preserveAspectRatio="none" aria-label="Recorded cycle lengths line chart"><line x1="7" y1="88" x2="95" y2="88" /><line x1="7" y1="50" x2="95" y2="50" /><polyline points={chartPoints} /><g>{recorded.map((item, index) => { const [x, y] = chartPoints.split(' ')[index].split(','); return <circle key={item.entry.id} cx={x} cy={y} r="2.8" /> })}</g></svg><div className="myflo-cycle-line-labels">{recorded.map((item) => <span key={item.entry.id}>{humanDate(item.entry.startDate, { month: 'short' })}</span>)}</div></> : <div className="myflo-history-empty"><TrendingUp size={24} /><p>Log one more period start to see your personal cycle-length trend.</p><Button variant="secondary" onClick={onOpenTrack}>Log today</Button></div>}</Card>
+      <section className="myflo-recent-cycles"><div className="myflo-section-title"><h2>Recent Cycles</h2><span>{recent.length ? `${recent.length} recorded` : 'No intervals yet'}</span></div>{recent.length ? recent.map((cycle) => <div className="myflo-recent-cycle-row" key={cycle.entry.id}><strong>{cycle.length} days</strong><span><i style={{ width: `${Math.min(100, (cycle.length / Math.max(35, maxChart)) * 100)}%` }} /></span><small>{humanDate(cycle.entry.startDate, { day: 'numeric', month: 'short' })}{cycle.entry.endDate ? ` · ${cycle.periodLength} day period` : ''}</small></div>) : <Card className="myflo-history-empty-card"><p>When you record consecutive period starts, Myflo will show actual cycle intervals here.</p></Card>}</section>
+      <section className="myflo-cycle-insight"><Chibi mood="calm" size="md" /><div><h3>Cycle Insight</h3><p>{prediction.nextPeriodStart ? `Your next cycle estimate is ${humanDate(prediction.nextPeriodStart)}. It is ${prediction.confidence} confidence based on your own recorded history.` : 'More history gives you a more personal estimate. Predictions stay cautious when data is limited or cycles vary.'}</p></div></section>
+    </>}
+    {active === 'symptoms' && <Card className="myflo-history-list"><div className="myflo-history-chart-title"><div><h2>Symptoms you recorded</h2><small>Across {data.dailyLogs.length} saved check-in{data.dailyLogs.length === 1 ? '' : 's'}</small></div></div>{commonSymptoms.length ? commonSymptoms.map(([symptom, count]) => <div key={symptom} className="myflo-stat-list-row"><span><Chibi mood="anxious" size="xs" /></span><div><strong>{symptom.replace('_', ' ')}</strong><small>Recorded {count} time{count === 1 ? '' : 's'}</small></div><b>{count}</b></div>) : <EmptyState icon={<Sparkles size={24} />} title="No symptom pattern yet" description="Save symptom check-ins to see only the patterns you actually record." action={<Button onClick={onOpenTrack}>Log symptoms</Button>} />}</Card>}
+    {active === 'mood' && <Card className="myflo-history-list"><div className="myflo-history-chart-title"><div><h2>Mood check-ins</h2><small>Only moods you chose to record are shown.</small></div></div>{commonMoods.length ? commonMoods.map(([mood, count]) => <div key={mood} className="myflo-stat-list-row"><span><Chibi mood={mood} size="xs" /></span><div><strong>{formatMood(mood)}</strong><small>Recorded {count} time{count === 1 ? '' : 's'}</small></div><b>{count}</b></div>) : <EmptyState icon={<HeartPulse size={24} />} title="No mood pattern yet" description="Mood entries are optional. Add one only when it helps you reflect." action={<Button onClick={onOpenTrack}>Open symptom log</Button>} />}</Card>}
+    <Notice tone="info"><Info size={18} /><div><strong>Patterns are observations, not proof.</strong><span>These charts describe your own saved records. They cannot confirm a cause or a medical condition.</span></div></Notice>
   </>
 }
 
-function PatternCard({ icon, label, value, total, description, tone }: { icon: React.ReactNode; label: string; value: number; total: number; description: string; tone: 'rose' | 'lavender' | 'sage' }) {
-  return <Card className={`pattern-card pattern-card--${tone}`}><span className="metric-icon">{icon}</span><p>{label}</p><strong>{total ? `${value}/${total}` : '—'}</strong><small>{description}</small></Card>
-}
-
-function NutritionDashboard({ data, onAddMeal, onDeleteMeal }: { data: AppData; onAddMeal: (meal: MealEntry) => void; onDeleteMeal: (id: string) => void }) {
+function NutritionDashboard({ data, onAddMeal, onDeleteMeal, openMealRequest = 0 }: { data: AppData; onAddMeal: (meal: MealEntry) => void; onDeleteMeal: (id: string) => void; openMealRequest?: number }) {
   const today = todayKey()
   const todayMeals = data.meals.filter((entry) => entry.date === today)
   const total = totalNutrients(todayMeals)
@@ -96,12 +111,13 @@ function NutritionDashboard({ data, onAddMeal, onDeleteMeal }: { data: AppData; 
   const weeklyCalories = weeklyDates.map((date) => ({ date, total: totalNutrients(data.meals.filter((entry) => entry.date === date)).calories }))
   const maxCalories = Math.max(500, ...weeklyCalories.map((entry) => entry.total))
   const [showComposer, setShowComposer] = useState(false)
+  useEffect(() => { if (openMealRequest > 0) setShowComposer(true) }, [openMealRequest])
 
   return <>
     <section className="nutrition-summary-grid"><Card className="nutrition-total-card"><div><p className="eyebrow">Today’s estimated intake</p><h2>{total.calories} <small>kcal</small></h2><p>From {todayMeals.length} saved meal{todayMeals.length === 1 ? '' : 's'}. Values are editable estimates.</p></div><span className="metric-icon metric-icon--amber"><Salad size={22} /></span></Card><Card className="macro-card"><div><span>Protein</span><strong>{formatNutrient(total.proteinG, 'g', 1)}</strong><ProgressBar value={total.proteinG} max={50} tone="sage" /></div><div><span>Fiber</span><strong>{formatNutrient(total.fiberG, 'g', 1)}</strong><ProgressBar value={total.fiberG} max={25} tone="lavender" /></div><div><span>Iron</span><strong>{formatNutrient(total.ironMg, 'mg', 1)}</strong><ProgressBar value={total.ironMg ?? 0} max={18} tone="rose" /></div><div><span>Zinc</span><strong>{formatNutrient(total.zincMg, 'mg', 1)}</strong><ProgressBar value={total.zincMg ?? 0} max={8} tone="amber" /></div></Card></section>
     <Notice tone="info"><Info size={19} /><div><strong>Nutrition estimates are not lab results.</strong><span>Portion size, recipes, oil, ghee, sauces, and ingredients can meaningfully change results. This dashboard does not diagnose nutrient deficiencies.</span></div></Notice>
 
-    <Card className="scanner-card"><div className="scanner-card__top"><div><p className="eyebrow">Food photo scanner</p><h2>Confirm before you save.</h2><p>Photos cannot reliably identify every ingredient, portion, or hidden oil. Flowra keeps you in control of every estimate.</p></div><span className="scanner-icon"><Camera size={28} /></span></div><div className="scanner-steps"><span><b>1</b> Add photo or meal name</span><span><b>2</b> Confirm portion & ingredients</span><span><b>3</b> Review nutrition estimate</span><span><b>4</b> Save it to your day</span></div><Button onClick={() => setShowComposer(true)}><Plus size={18} /> Add a meal manually</Button><p className="fine-print"><strong>Cloud photo analysis is not configured in this build.</strong> A production server-side vision provider and validated nutrition database are required before food-photo analysis can be enabled. No uploaded image is sent anywhere here.</p></Card>
+    <Card className="scanner-card"><div className="scanner-card__top"><div><p className="eyebrow">Food photo scanner</p><h2>Confirm before you save.</h2><p>Photos cannot reliably identify every ingredient, portion, or hidden oil. Myflo keeps you in control of every estimate.</p></div><span className="scanner-icon"><Camera size={28} /></span></div><div className="scanner-steps"><span><b>1</b> Add photo or meal name</span><span><b>2</b> Confirm portion & ingredients</span><span><b>3</b> Review nutrition estimate</span><span><b>4</b> Save it to your day</span></div><Button onClick={() => setShowComposer(true)}><Plus size={18} /> Add a meal manually</Button><p className="fine-print"><strong>Cloud photo analysis is not configured in this build.</strong> A production server-side vision provider and validated nutrition database are required before food-photo analysis can be enabled. No uploaded image is sent anywhere here.</p></Card>
 
     <section className="section-heading"><div><p className="eyebrow">Today’s meals</p><h2>Saved meal log</h2></div><Button variant="secondary" onClick={() => setShowComposer(true)}><Plus size={17} /> Add meal</Button></section>
     {todayMeals.length ? <div className="meal-list">{todayMeals.map((meal) => <Card key={meal.id} className="meal-row"><span className="metric-icon metric-icon--amber"><Utensils size={20} /></span><div><strong>{meal.name}</strong><small>{meal.mealType[0].toUpperCase() + meal.mealType.slice(1)} · {meal.portionLabel} · {meal.confidence === 'estimated' ? 'Editable estimate' : 'User-entered'}</small><span className="meal-nutrients">{meal.nutrients.calories} kcal · {meal.nutrients.proteinG}g protein · {meal.nutrients.fiberG}g fiber</span></div><button className="small-icon-button" onClick={() => onDeleteMeal(meal.id)} aria-label={`Delete ${meal.name}`}><Trash2 size={17} /></button></Card>)}</div> : <Card><EmptyState icon={<Utensils size={25} />} title="No meals logged today" description="Add a meal when it helps—not every meal needs to be perfectly tracked." action={<Button onClick={() => setShowComposer(true)}>Add a meal</Button>} /></Card>}
@@ -168,14 +184,14 @@ function Companion({ data }: { data: AppData }) {
     const lower = question.toLowerCase()
     const urgentWords = ['faint', 'pass out', 'pregnan', 'severe pain', 'can\'t breathe', 'cannot breathe', 'heavy bleeding', 'soaking']
     if (urgentWords.some((word) => lower.includes(word))) {
-      setReply('Because you mentioned a possible warning sign, Flowra cannot safely answer this as a routine wellness question. If you have severe or rapidly worsening pain, fainting, difficulty breathing, very heavy bleeding, or possible pregnancy with pain or bleeding, seek prompt in-person medical assessment. If you feel in immediate danger, contact local emergency services.'); return
+      setReply('Because you mentioned a possible warning sign, Myflo cannot safely answer this as a routine wellness question. If you have severe or rapidly worsening pain, fainting, difficulty breathing, very heavy bleeding, or possible pregnancy with pain or bleeding, seek prompt in-person medical assessment. If you feel in immediate danger, contact local emergency services.'); return
     }
     if (!todayLog) {
       setReply('I do not have a check-in for today yet, so I cannot personalize this safely. You can log pain, flow, energy, stress, and symptoms first. In general, I can help you turn your own records into questions to discuss with a clinician, but I cannot diagnose a condition.'); return
     }
     const safety = evaluateSafety(todayLog)
     if (safety.some((alert) => alert.severity === 'urgent')) {
-      setReply(`Your saved check-in includes a concern that should come before a general answer: ${safety.find((alert) => alert.severity === 'urgent')?.action} Flowra cannot determine the cause.`); return
+      setReply(`Your saved check-in includes a concern that should come before a general answer: ${safety.find((alert) => alert.severity === 'urgent')?.action} Myflo cannot determine the cause.`); return
     }
     const recurringBloating = recentLogs.filter((log) => log.bloatingScore >= 5).length
     const descriptors = [`today you recorded pain ${todayLog.painScore}/10`, `stress ${todayLog.stressScore}/10`, `energy ${todayLog.energyScore}/10`, `and mood ${formatMood(todayLog.mood).toLowerCase()}`]
@@ -184,9 +200,9 @@ function Companion({ data }: { data: AppData }) {
   }
 
   return <>
-    <Card className="companion-hero"><div><span className="companion-orb"><Bot size={29} /></span><p className="eyebrow">Flowra Health Companion</p><h2>Private, safety-first reflection.</h2><p>This local prototype uses your saved entries and deterministic safety rules. It is not a clinician, diagnostic service, or cloud AI integration.</p></div><Pill tone="sage">No data sent</Pill></Card>
+    <Card className="companion-hero"><div><span className="companion-orb"><Bot size={29} /></span><p className="eyebrow">Myflo Health Companion</p><h2>Private, safety-first reflection.</h2><p>This local prototype uses your saved entries and deterministic safety rules. It is not a clinician, diagnostic service, or cloud AI integration.</p></div><Pill tone="sage">No data sent</Pill></Card>
     <Notice tone="warning"><AlertTriangle size={19} /><div><strong>Always use urgent care when needed.</strong><span>The companion will not diagnose, prescribe medication, infer pregnancy, or reassure away severe warning signs.</span></div></Notice>
-    <Card className="companion-chat"><div className="companion-chat__intro"><MessageCircleHeart size={22} /><div><h3>What would you like to understand?</h3><p>Try: “My period is due soon, I have cramps, and my stress is high.”</p></div></div>{reply && <div className="companion-reply"><span>Flowra</span><p>{reply}</p></div>}<label className="companion-input"><textarea value={question} onChange={(event) => setQuestion(event.target.value.slice(0, 500))} rows={4} maxLength={500} placeholder="Tell Flowra what is going on…" /><Button onClick={ask} disabled={!question.trim()} aria-label="Ask companion"><Send size={18} /> Ask</Button></label><p className="fine-print">Your question is processed in this browser only in the current build. A server-side health AI provider must be explicitly configured and consented to before any cloud processing is introduced.</p></Card>
+    <Card className="companion-chat"><div className="companion-chat__intro"><MessageCircleHeart size={22} /><div><h3>What would you like to understand?</h3><p>Try: “My period is due soon, I have cramps, and my stress is high.”</p></div></div>{reply && <div className="companion-reply"><span>Myflo</span><p>{reply}</p></div>}<label className="companion-input"><textarea value={question} onChange={(event) => setQuestion(event.target.value.slice(0, 500))} rows={4} maxLength={500} placeholder="Tell Myflo what is going on…" /><Button onClick={ask} disabled={!question.trim()} aria-label="Ask companion"><Send size={18} /> Ask</Button></label><p className="fine-print">Your question is processed in this browser only in the current build. A server-side health AI provider must be explicitly configured and consented to before any cloud processing is introduced.</p></Card>
     <Card className="companion-context"><p className="eyebrow">Available context</p><h3>The companion can only use what you save.</h3><div>{['Cycle history', 'Daily symptoms & scores', 'Sleep & water', 'Saved meal estimates', 'Medication records'].map((item) => <span key={item}><Sparkles size={15} /> {item}</span>)}</div><p>It does not infer missing health data, and it does not claim that one tracked factor caused another.</p></Card>
   </>
 }

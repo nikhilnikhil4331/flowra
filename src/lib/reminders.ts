@@ -43,7 +43,7 @@ export function scheduleLocalReminders(reminders: Reminder[], onDelivered: (id: 
     const timer = window.setTimeout(() => {
       const deliveryTime = new Date()
       if (isWithinQuietHours(deliveryTime, reminder.quietHoursStart, reminder.quietHoursEnd)) return
-      new Notification('Flowra', { body: reminder.title, tag: `flowra-${reminder.id}` })
+      new Notification('Myflo', { body: reminder.title, tag: `myflo-${reminder.id}` })
       onDelivered(reminder.id, deliveryTime.toISOString())
     }, delay)
     timers.push(timer)
