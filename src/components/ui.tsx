@@ -1,7 +1,8 @@
 import type { ButtonHTMLAttributes, PropsWithChildren, ReactNode } from 'react'
 import { CalendarDays, ChartNoAxesCombined, Droplet, Home, Menu, NotebookPen, Pill as PillIcon, Plus, ScanLine, Stethoscope, X } from 'lucide-react'
 
-export type AppView = 'home' | 'calendar' | 'track' | 'insights' | 'more'
+export type PrimaryView = 'home' | 'calendar' | 'track' | 'insights' | 'more'
+export type AppView = PrimaryView | 'periodLog' | 'bodyTracker' | 'foodScanner' | 'nutritionResult' | 'dailyNutrition' | 'flowColor' | 'flowGuide' | 'medicineCare' | 'addMedicine'
 export type QuickAction = 'period' | 'symptoms' | 'food' | 'medicine' | 'note'
 
 export function BrandMark({ compact = false }: { compact?: boolean }) {
@@ -48,7 +49,7 @@ export function LoadingSkeleton({ lines = 3 }: { lines?: number }) {
   return <div className="skeleton-group" aria-label="Loading content" aria-busy="true">{Array.from({ length: lines }, (_, index) => <span key={index} className="skeleton" />)}</div>
 }
 
-const navItems: { id: Exclude<AppView, 'track'>; label: string; icon: typeof Home }[] = [
+const navItems: { id: Exclude<PrimaryView, 'track'>; label: string; icon: typeof Home }[] = [
   { id: 'home', label: 'Home', icon: Home },
   { id: 'calendar', label: 'Calendar', icon: CalendarDays },
   { id: 'insights', label: 'Insights', icon: ChartNoAxesCombined },
@@ -56,10 +57,11 @@ const navItems: { id: Exclude<AppView, 'track'>; label: string; icon: typeof Hom
 ]
 
 export function AppNavigation({ current, onNavigate, onQuickAction }: { current: AppView; onNavigate: (view: AppView) => void; onQuickAction: () => void }) {
+  const section: PrimaryView = current === 'periodLog' ? 'calendar' : current === 'bodyTracker' ? 'track' : ['foodScanner', 'nutritionResult', 'dailyNutrition'].includes(current) ? 'insights' : ['flowColor', 'flowGuide', 'medicineCare', 'addMedicine'].includes(current) ? 'more' : current as PrimaryView
   return <nav className="bottom-nav myflo-bottom-nav" aria-label="Main navigation">
-    {navItems.slice(0, 2).map(({ id, label, icon: Icon }) => <button key={id} className={current === id ? 'is-active' : ''} onClick={() => onNavigate(id)} aria-current={current === id ? 'page' : undefined}><span><Icon size={20} strokeWidth={current === id ? 2.45 : 1.8} /></span><small>{label}</small></button>)}
-    <button className={`quick-add ${current === 'track' ? 'is-active' : ''}`} onClick={onQuickAction} aria-label="Open quick actions" aria-haspopup="dialog"><span><Plus size={28} strokeWidth={2.2} /></span></button>
-    {navItems.slice(2).map(({ id, label, icon: Icon }) => <button key={id} className={current === id ? 'is-active' : ''} onClick={() => onNavigate(id)} aria-current={current === id ? 'page' : undefined}><span><Icon size={20} strokeWidth={current === id ? 2.45 : 1.8} /></span><small>{label}</small></button>)}
+    {navItems.slice(0, 2).map(({ id, label, icon: Icon }) => <button key={id} className={section === id ? 'is-active' : ''} onClick={() => onNavigate(id)} aria-current={section === id ? 'page' : undefined}><span><Icon size={20} strokeWidth={section === id ? 2.45 : 1.8} /></span><small>{label}</small></button>)}
+    <button className={`quick-add ${section === 'track' ? 'is-active' : ''}`} onClick={onQuickAction} aria-label="Open quick actions" aria-haspopup="dialog"><span><Plus size={28} strokeWidth={2.2} /></span></button>
+    {navItems.slice(2).map(({ id, label, icon: Icon }) => <button key={id} className={section === id ? 'is-active' : ''} onClick={() => onNavigate(id)} aria-current={section === id ? 'page' : undefined}><span><Icon size={20} strokeWidth={section === id ? 2.45 : 1.8} /></span><small>{label}</small></button>)}
   </nav>
 }
 

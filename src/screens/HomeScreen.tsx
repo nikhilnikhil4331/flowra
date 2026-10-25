@@ -1,4 +1,4 @@
-import { Bell, CalendarDays, ChevronRight, Droplet, GlassWater, Menu, Pill, Sparkles, Utensils } from 'lucide-react'
+import { Bell, CalendarDays, ChevronRight, Droplet, GlassWater, Pill, Sparkles, Utensils } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import type { AppData, CyclePrediction } from '../domain/types'
 import { getCurrentCycleDay, getCyclePhase, humanDate, todayKey } from '../domain/cycle'
@@ -9,7 +9,7 @@ import { Notice } from '../components/ui'
 interface HomeScreenProps {
   data: AppData
   prediction: CyclePrediction
-  onNavigate: (view: 'calendar' | 'track' | 'insights' | 'more') => void
+  onNavigate: (view: 'calendar' | 'track' | 'insights' | 'more' | 'medicineCare') => void
 }
 
 function daysUntilDate(target: string | undefined, today: string): number | undefined {
@@ -48,9 +48,8 @@ export function HomeScreen({ data, prediction, onNavigate }: HomeScreenProps) {
 
   return <div className="screen myflo-home-screen">
     <header className="myflo-home-header">
-      <button className="myflo-header-icon" onClick={() => onNavigate('more')} aria-label="Open menu"><Menu size={23} /></button>
       <div><h1>Hi{name ? `, ${name}` : ''} <Blossom /></h1><p>Take care of yourself today</p></div>
-      <button className="myflo-header-icon myflo-header-icon--bell" onClick={() => onNavigate('more')} aria-label="Open notifications"><Bell size={20} /></button>
+      <div className="myflo-home-header__actions"><button className="myflo-header-icon myflo-header-icon--bell" onClick={() => onNavigate('more')} aria-label="Open notifications"><Bell size={19} /></button><button className="myflo-home-avatar" onClick={() => onNavigate('more')} aria-label="Open profile"><img src="/assets/home-chibi.png" alt="" /></button></div>
     </header>
 
     {alert && <Notice tone={alert.severity === 'urgent' ? 'urgent' : 'warning'}><strong>{alert.title}</strong><span>{alert.action}</span><button onClick={() => onNavigate('track')}>Open today’s log <ChevronRight size={15} /></button></Notice>}
@@ -60,13 +59,13 @@ export function HomeScreen({ data, prediction, onNavigate }: HomeScreenProps) {
     <button className="myflo-next-period-card" onClick={() => onNavigate('calendar')}>
       <span className="myflo-next-period-card__drop"><Droplet size={24} fill="currentColor" /></span>
       <span className="myflo-next-period-card__copy"><small>Next Period</small><strong>{prediction.nextPeriodStart ? humanDate(prediction.nextPeriodStart, { day: 'numeric', month: 'short', year: 'numeric' }) : 'Not estimated yet'}</strong><em>{nextPeriodCopy}</em></span>
-      <Chibi mood="happy" size="md" className="myflo-next-period-card__chibi" />
+      <img className="myflo-next-period-card__chibi myflo-next-period-card__chibi-image" src="/assets/home-chibi.png" alt="" aria-hidden="true" />
     </button>
 
     <section className="myflo-quick-cards" aria-label="Quick checks">
       <button className="myflo-quick-card myflo-quick-card--peach" onClick={() => onNavigate('track')}><Chibi mood={todayLog?.mood ?? 'happy'} size="sm" /><strong>Mood</strong><small>{todayLog?.mood ? `Feeling ${todayLog.mood.replace('_', ' ')}` : 'How are you feeling?'}</small></button>
       <button className="myflo-quick-card myflo-quick-card--blush" onClick={() => onNavigate('track')}><Chibi mood="anxious" size="sm" /><strong>Cramps</strong><small>{todayLog ? `${todayLog.painScore}/10 pain today` : 'Any symptoms?'}</small></button>
-      <button className="myflo-quick-card myflo-quick-card--blue" onClick={() => onNavigate('more')}><Pill size={30} /><strong>Medicine</strong><small>Record what you use</small></button>
+      <button className="myflo-quick-card myflo-quick-card--blue" onClick={() => onNavigate('medicineCare')}><Pill size={30} /><strong>Medicine</strong><small>Record what you use</small></button>
     </section>
 
     <section className="myflo-home-overview">

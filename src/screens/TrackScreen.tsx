@@ -12,6 +12,7 @@ interface TrackScreenProps {
   onSave: (log: DailyLog) => void
   onDelete: (id: string) => void
   onOpenFlowGuide: () => void
+  onOpenBodyTracker: () => void
   onBack: () => void
 }
 
@@ -60,10 +61,7 @@ const moods: { id: Mood; label: string }[] = [
   { id: 'calm', label: 'Calm' },
   { id: 'happy', label: 'Happy' },
   { id: 'anxious', label: 'Anxious' },
-  { id: 'sad', label: 'Sad' },
-  { id: 'low', label: 'Low mood' },
-  { id: 'confused', label: 'Confused' },
-  { id: 'irritable', label: 'Irritable' },
+  { id: 'irritable', label: 'Good' },
   { id: 'sleepy', label: 'Sleepy' },
 ]
 
@@ -76,10 +74,6 @@ const symptoms: { id: Symptom; label: string; icon: string }[] = [
   { id: 'back_pain', label: 'Back pain', icon: '↕' },
   { id: 'nausea', label: 'Nausea', icon: '⌇' },
   { id: 'food_cravings', label: 'Food cravings', icon: '◐' },
-  { id: 'breast_tenderness', label: 'Tenderness', icon: '◇' },
-  { id: 'constipation', label: 'Constipation', icon: '◌' },
-  { id: 'diarrhea', label: 'Diarrhea', icon: '≈' },
-  { id: 'sleep_disturbance', label: 'Sleep changes', icon: '☾' },
 ]
 
 const painLocations: { id: PainLocation; label: string }[] = [
@@ -99,7 +93,7 @@ function ToggleChip({ active, onClick, children }: { active: boolean; onClick: (
   return <button type="button" className={`choice-chip ${active ? 'is-selected' : ''}`} aria-pressed={active} onClick={onClick}>{active && <Check size={14} />}{children}</button>
 }
 
-export function TrackScreen({ logs, onSave, onDelete, onOpenFlowGuide, onBack }: TrackScreenProps) {
+export function TrackScreen({ logs, onSave, onDelete, onOpenFlowGuide, onOpenBodyTracker, onBack }: TrackScreenProps) {
   const today = todayKey()
   const [date, setDate] = useState(today)
   const [form, setForm] = useState<FormState>(() => fromLog(logs.find((entry) => entry.date === today), today))
@@ -140,6 +134,8 @@ export function TrackScreen({ logs, onSave, onDelete, onOpenFlowGuide, onBack }:
     </Card>
 
     <Card className="symptoms-card"><div className="card-title-row"><div><h2>Physical Symptoms</h2><p>Select all that apply.</p></div><Sparkles size={21} /></div><div className="symptom-grid">{symptoms.map((symptom) => <button type="button" key={symptom.id} onClick={() => selectedSymptoms(symptom.id)} aria-pressed={form.symptoms.includes(symptom.id)} className={`symptom-option ${form.symptoms.includes(symptom.id) ? 'is-selected' : ''}`}><Chibi mood={symptom.id === 'cramps' ? 'anxious' : 'calm'} size="xs" />{symptom.label}</button>)}</div></Card>
+    <Card className="myflo-flow-score-card"><ScoreSlider label="Flow Score" helper="Luteal symptoms" value={form.painScore} onChange={(value) => update('painScore', value)} lowLabel="0" highLabel="10" icon={<Droplet size={19} fill="currentColor" />} /></Card>
+    <button className="myflo-body-tracker-link" onClick={onOpenBodyTracker}>Continue to Body Tracker <ChevronRight size={16} /></button>
 
     <div className="track-grid">
       <Card className="pain-card">

@@ -9,6 +9,7 @@ import { TrackScreen } from './screens/TrackScreen'
 import { InsightsScreen } from './screens/InsightsScreen'
 import { MoreScreen } from './screens/MoreScreen'
 import { FlowGuideScreen } from './screens/FlowGuideScreen'
+import { AddMedicineScreen, BodyTrackerScreen, DailyNutritionScreen, FlowColorScreen, FoodScannerScreen, MedicineCareScreen, NutritionResultScreen, PeriodLogScreen } from './screens/MyfloReferenceScreens'
 import { predictCycle } from './domain/cycle'
 import { createId, nowIso, useMyfloStore } from './lib/store'
 import { scheduleLocalReminders } from './lib/reminders'
@@ -18,12 +19,10 @@ type InsightsLaunch = 'history' | 'nutrition' | 'companion'
 export default function App() {
   const store = useMyfloStore()
   const [view, setView] = useState<AppView>('home')
-  const [showFlowGuide, setShowFlowGuide] = useState(false)
   const [showQuickActions, setShowQuickActions] = useState(false)
   const [showStorageNotice, setShowStorageNotice] = useState(true)
   const [insightsLaunch, setInsightsLaunch] = useState<InsightsLaunch>('history')
-  const [openPeriodRequest, setOpenPeriodRequest] = useState(0)
-  const [openMealRequest, setOpenMealRequest] = useState(0)
+  const [scanPreview, setScanPreview] = useState<string | undefined>()
   const prediction = predictCycle(store.data.cycles)
 
   useEffect(() => {
@@ -42,7 +41,6 @@ export default function App() {
   }
 
   const navigate = (next: AppView) => {
-    setShowFlowGuide(false)
     setShowQuickActions(false)
     if (next === 'insights') setInsightsLaunch('history')
     setView(next)
@@ -50,14 +48,11 @@ export default function App() {
     document.querySelector<HTMLElement>('.app-main')?.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const openFlowGuide = () => { setShowQuickActions(false); setShowFlowGuide(true); window.scrollTo({ top: 0, behavior: 'smooth' }) }
-
   const handleQuickAction = (action: QuickAction) => {
-    setShowQuickActions(false)
-    if (action === 'period') { setOpenPeriodRequest((value) => value + 1); setView('calendar'); return }
+    if (action === 'period') { navigate('periodLog'); return }
     if (action === 'symptoms' || action === 'note') { navigate('track'); return }
-    if (action === 'food') { setOpenMealRequest((value) => value + 1); setInsightsLaunch('nutrition'); setView('insights'); return }
-    if (action === 'medicine') { setView('more'); return }
+    if (action === 'food') { navigate('foodScanner'); return }
+    if (action === 'medicine') navigate('addMedicine')
   }
 
   if (!store.data.profile.setupComplete) return <Onboarding onComplete={completeOnboarding} />
@@ -67,13 +62,20 @@ export default function App() {
     <FloralLineArt position="top-right" />
     <main className="app-main">
       {store.storageError && showStorageNotice && <Notice tone="warning"><AlertCircle size={19} /><div><strong>Your latest change may not have been saved.</strong><span>Browser storage is unavailable or full. Export any visible information and check browser privacy settings.</span></div><Button variant="icon" aria-label="Dismiss storage warning" onClick={() => setShowStorageNotice(false)}><X size={17} /></Button></Notice>}
-      {showFlowGuide ? <FlowGuideScreen onBack={() => setShowFlowGuide(false)} onLogFlow={() => { setShowFlowGuide(false); navigate('track') }} /> : <>
-        {view === 'home' && <HomeScreen data={store.data} prediction={prediction} onNavigate={navigate} />}
-        {view === 'calendar' && <CalendarScreen data={store.data} prediction={prediction} onSaveCycle={store.upsertCycle} onDeleteCycle={store.deleteCycle} onNavigate={navigate} openPeriodRequest={openPeriodRequest} />}
-        {view === 'track' && <TrackScreen logs={store.data.dailyLogs} onSave={store.upsertLog} onDelete={store.deleteLog} onOpenFlowGuide={openFlowGuide} onBack={() => navigate('home')} />}
-        {view === 'insights' && <InsightsScreen data={store.data} prediction={prediction} onAddMeal={store.addMeal} onDeleteMeal={store.deleteMeal} onOpenTrack={() => navigate('track')} initialScreen={insightsLaunch} openMealRequest={openMealRequest} />}
-        {view === 'more' && <MoreScreen data={store.data} onUpdateProfile={store.updateProfile} onUpdateConsent={store.updateConsent} onUpsertReminder={store.upsertReminder} onDeleteReminder={store.deleteReminder} onAddMedication={store.addMedication} onResetData={() => { store.resetData(); setView('home') }} onOpenFlowGuide={openFlowGuide} />}
-      </>}
+      {view === 'home' && <HomeScreen data={store.data} prediction={prediction} onNavigate={navigate} />}
+      {view === 'calendar' && <CalendarScreen data={store.data} prediction={prediction} onSaveCycle={store.upsertCycle} onDeleteCycle={store.deleteCycle} onNavigate={navigate} />}
+      {view === 'periodLog' && <PeriodLogScreen logs={store.data.dailyLogs} onSaveCycle={store.upsertCycle} onSaveLog={store.upsertLog} onBack={() => navigate('calendar')} />}
+      {view === 'track' && <TrackScreen logs={store.data.dailyLogs} onSave={store.upsertLog} onDelete={store.deleteLog} onOpenFlowGuide={() => navigate('flowColor')} onBack={() => navigate('home')} onOpenBodyTracker={() => navigate('bodyTracker')} />}
+      {view === 'bodyTracker' && <BodyTrackerScreen logs={store.data.dailyLogs} onSave={store.upsertLog} onBack={() => navigate('track')} />}
+      {view === 'insights' && <InsightsScreen data={store.data} prediction={prediction} onAddMeal={store.addMeal} onDeleteMeal={store.deleteMeal} onOpenTrack={() => navigate('track')} initialScreen={insightsLaunch} />}
+      {view === 'foodScanner' && <FoodScannerScreen meals={store.data.meals} onBack={() => navigate('insights')} onContinue={(preview) => { setScanPreview(preview); navigate('nutritionResult') }} />}
+      {view === 'nutritionResult' && <NutritionResultScreen preview={scanPreview} onBack={() => navigate('foodScanner')} onSave={store.addMeal} onSaved={() => navigate('dailyNutrition')} onAddAnother={() => navigate('foodScanner')} />}
+      {view === 'dailyNutrition' && <DailyNutritionScreen data={store.data} onBack={() => navigate('insights')} onAdd={() => navigate('foodScanner')} />}
+      {view === 'flowColor' && <FlowColorScreen logs={store.data.dailyLogs} onSave={store.upsertLog} onBack={() => navigate('track')} onOpenGuide={() => navigate('flowGuide')} />}
+      {view === 'flowGuide' && <FlowGuideScreen onBack={() => navigate('flowColor')} onLogFlow={() => navigate('track')} />}
+      {view === 'medicineCare' && <MedicineCareScreen medications={store.data.medications} onBack={() => navigate('more')} onAdd={() => navigate('addMedicine')} onDelete={store.deleteMedication} />}
+      {view === 'addMedicine' && <AddMedicineScreen onBack={() => navigate('medicineCare')} onSave={store.addMedication} onAddReminder={store.upsertReminder} />}
+      {view === 'more' && <MoreScreen data={store.data} onUpdateProfile={store.updateProfile} onUpdateConsent={store.updateConsent} onUpsertReminder={store.upsertReminder} onDeleteReminder={store.deleteReminder} onAddMedication={store.addMedication} onResetData={() => { store.resetData(); setView('home') }} onOpenFlowGuide={() => navigate('flowGuide')} onOpenMedicine={() => navigate('medicineCare')} />}
     </main>
     <AppNavigation current={view} onNavigate={navigate} onQuickAction={() => setShowQuickActions(true)} />
     {showQuickActions && <QuickActionSheet onClose={() => setShowQuickActions(false)} onSelect={handleQuickAction} />}

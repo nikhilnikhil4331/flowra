@@ -116,6 +116,7 @@ export interface MedicationRecord {
   reason?: string
   sideEffects?: string
   helped?: 'yes' | 'no' | 'unsure'
+  repeat?: 'only_this_cycle' | 'daily' | 'as_needed'
   createdAt: string
 }
 

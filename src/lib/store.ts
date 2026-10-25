@@ -129,6 +129,10 @@ export function useMyfloStore() {
     update((current) => ({ ...current, medications: [medication, ...current.medications] }))
   }, [update])
 
+  const deleteMedication = useCallback((id: string) => {
+    update((current) => ({ ...current, medications: current.medications.filter((item) => item.id !== id) }))
+  }, [update])
+
   const updateProfile = useCallback((profile: Partial<AppData['profile']>) => {
     update((current) => ({ ...current, profile: { ...current.profile, ...profile } }))
   }, [update])
@@ -153,6 +157,7 @@ export function useMyfloStore() {
     upsertReminder,
     deleteReminder,
     addMedication,
+    deleteMedication,
     updateProfile,
     updateConsent,
     replaceData,

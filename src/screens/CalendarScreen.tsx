@@ -1,5 +1,5 @@
 import { ArrowLeft, CalendarDays, ChevronLeft, ChevronRight, CircleHelp, Droplet, Edit3, NotebookPen, Plus, Sparkles, Trash2, Waves, X } from 'lucide-react'
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useMemo, useState, type FormEvent } from 'react'
 import type { AppData, CycleEntry, CyclePrediction } from '../domain/types'
 import { dateIsEstimatedPeriod, dateIsFertile, dateIsRecordedPeriod, humanDate, todayKey, toDateKey } from '../domain/cycle'
 import { Button, Notice, Pill } from '../components/ui'
@@ -11,8 +11,7 @@ interface CalendarScreenProps {
   prediction: CyclePrediction
   onSaveCycle: (cycle: CycleEntry) => void
   onDeleteCycle: (id: string) => void
-  onNavigate: (view: 'home' | 'track' | 'insights' | 'more') => void
-  openPeriodRequest?: number
+  onNavigate: (view: 'home' | 'track' | 'insights' | 'more' | 'periodLog') => void
   onBack?: () => void
 }
 
@@ -25,7 +24,7 @@ function calendarDays(monthDate: Date): Date[] {
   return Array.from({ length: 42 }, (_, index) => { const date = new Date(first); date.setUTCDate(first.getUTCDate() + index); return date })
 }
 
-export function CalendarScreen({ data, prediction, onSaveCycle, onDeleteCycle, onNavigate, onBack, openPeriodRequest = 0 }: CalendarScreenProps) {
+export function CalendarScreen({ data, prediction, onSaveCycle, onDeleteCycle, onNavigate, onBack }: CalendarScreenProps) {
   const today = todayKey()
   const [cursor, setCursor] = useState(() => { const date = new Date(`${today}T00:00:00Z`); return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1)) })
   const [selected, setSelected] = useState(today)
@@ -38,9 +37,7 @@ export function CalendarScreen({ data, prediction, onSaveCycle, onDeleteCycle, o
   const selectedLog = data.dailyLogs.find((entry) => entry.date === selected)
   const selectedCycle = data.cycles.find((entry) => selected >= entry.startDate && selected <= (entry.endDate ?? entry.startDate))
 
-  const openNewCycle = () => { setEditing(null); setFormError(''); setShowForm(true) }
   const openEditCycle = (cycle: CycleEntry) => { setEditing(cycle); setFormError(''); setShowForm(true) }
-  useEffect(() => { if (openPeriodRequest > 0) openNewCycle() }, [openPeriodRequest])
   const previousMonth = () => setCursor((current) => new Date(Date.UTC(current.getUTCFullYear(), current.getUTCMonth() - 1, 1)))
   const nextMonth = () => setCursor((current) => new Date(Date.UTC(current.getUTCFullYear(), current.getUTCMonth() + 1, 1)))
 
@@ -58,7 +55,7 @@ export function CalendarScreen({ data, prediction, onSaveCycle, onDeleteCycle, o
   }
 
   return <div className="screen myflo-calendar-screen">
-    <header className="myflo-page-header"><button className="myflo-back-button" onClick={onBack ?? (() => onNavigate('home'))} aria-label="Back to home"><ArrowLeft size={20} /></button><h1>Calendar</h1><button className="myflo-header-icon myflo-calendar-add" onClick={openNewCycle} aria-label="Log a period"><Plus size={20} /></button></header>
+    <header className="myflo-page-header"><button className="myflo-back-button" onClick={onBack ?? (() => onNavigate('home'))} aria-label="Back to home"><ArrowLeft size={20} /></button><h1>Calendar</h1><button className="myflo-header-icon myflo-calendar-add" onClick={() => onNavigate('periodLog')} aria-label="Log a period"><Plus size={20} /></button></header>
 
     <section className="myflo-calendar-panel">
       <div className="myflo-calendar-month"><button onClick={previousMonth} aria-label="Previous month"><ChevronLeft size={19} /></button><strong>{monthFormatter.format(cursor)}</strong><button onClick={nextMonth} aria-label="Next month"><ChevronRight size={19} /></button></div>
@@ -80,7 +77,7 @@ export function CalendarScreen({ data, prediction, onSaveCycle, onDeleteCycle, o
 
     <div className="myflo-calendar-legend"><span><i className="legend-period" />Period</span><span><i className="legend-fertile" />Fertile window</span><span><i className="legend-ovulation" />Ovulation</span><span><i className="legend-today" />Today</span></div>
 
-    <section className="myflo-calendar-events"><h2>Cycle Events</h2><div><button className="myflo-event-card myflo-event-card--lavender" onClick={openNewCycle}><Droplet size={23} fill="currentColor" /><span>Periods</span></button><button className="myflo-event-card myflo-event-card--peach" onClick={() => onNavigate('track')}><Waves size={23} /><span>Mucus</span></button><button className="myflo-event-card myflo-event-card--blush" onClick={() => prediction.ovulationDate && setSelected(prediction.ovulationDate)}><Sparkles size={23} /><span>Ovulation</span></button><button className="myflo-event-card myflo-event-card--blue" onClick={() => onNavigate('track')}><Chibi mood="calm" size="xs" /><span>Symptoms</span></button></div></section>
+    <section className="myflo-calendar-events"><h2>Cycle Events</h2><div><button className="myflo-event-card myflo-event-card--lavender" onClick={() => onNavigate('periodLog')}><Droplet size={23} fill="currentColor" /><span>Periods</span></button><button className="myflo-event-card myflo-event-card--peach" onClick={() => onNavigate('track')}><Waves size={23} /><span>Mucus</span></button><button className="myflo-event-card myflo-event-card--blush" onClick={() => prediction.ovulationDate && setSelected(prediction.ovulationDate)}><Sparkles size={23} /><span>Ovulation</span></button><button className="myflo-event-card myflo-event-card--blue" onClick={() => onNavigate('track')}><Chibi mood="calm" size="xs" /><span>Symptoms</span></button></div></section>
 
     <section className="myflo-calendar-note"><div className="myflo-section-title"><h2>Notes</h2><button onClick={() => onNavigate('track')}><Plus size={15} /> Add</button></div>{selectedCycle ? <button className="myflo-selected-note" onClick={() => openEditCycle(selectedCycle)}><span><Droplet size={17} fill="currentColor" /></span><div><strong>Recorded period</strong><small>{humanDate(selectedCycle.startDate)}{selectedCycle.endDate ? ` – ${humanDate(selectedCycle.endDate)}` : ''}{selectedCycle.notes ? ` · ${selectedCycle.notes}` : ''}</small></div><Edit3 size={16} /></button> : selectedLog?.notes ? <button className="myflo-selected-note" onClick={() => onNavigate('track')}><span className="is-note"><NotebookPen size={16} /></span><div><strong>{selectedLog.notes}</strong><small>{humanDate(selected, { weekday: 'short', day: 'numeric', month: 'short' })} · daily reflection</small></div><Edit3 size={16} /></button> : <button className="myflo-empty-note" onClick={() => onNavigate('track')}><NotebookPen size={17} /><span>Add a private note for {humanDate(selected, { day: 'numeric', month: 'short' })}</span><ChevronRight size={16} /></button>}</section>
 

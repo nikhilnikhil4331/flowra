@@ -15,6 +15,7 @@ interface MoreScreenProps {
   onAddMedication: (medication: MedicationRecord) => void
   onResetData: () => void
   onOpenFlowGuide: () => void
+  onOpenMedicine: () => void
 }
 
 const iconFor: Record<ReminderType, string> = { daily_log: '✦', water: '◌', nutrition: '◐', sleep: '☾', period: '◒', medication: '✚', appointment: '□' }
@@ -34,7 +35,7 @@ export function MoreScreen(props: MoreScreenProps) {
     <section className="more-menu-grid">
       <MenuItem icon={<FileHeart size={22} />} title="Flow Guide" description="Educational flow colour information" onClick={props.onOpenFlowGuide} tone="rose" />
       <MenuItem icon={<AlarmClock size={22} />} title="Reminders" description="Gentle, configurable check-ins" onClick={() => setSection('reminders')} tone="lavender" />
-      <MenuItem icon={<Pill size={22} />} title="Medicine & care" description="Record medicines you already use" onClick={() => setSection('medicine')} tone="sage" />
+      <MenuItem icon={<Pill size={22} />} title="Medicine & care" description="Record medicines you already use" onClick={props.onOpenMedicine} tone="sage" />
       <MenuItem icon={<MessageCircleWarning size={22} />} title="When to seek care" description="Clear safety and emergency guidance" onClick={() => setSection('emergency')} tone="warning" />
       <MenuItem icon={<LockKeyhole size={22} />} title="Privacy & data" description="Consent, export, and deletion" onClick={() => setSection('privacy')} tone="ivory" />
       <MenuItem icon={<UserRound size={22} />} title="Profile & cycle" description="Personal settings, no defaults forced" onClick={() => setSection('profile')} tone="lavender" />
