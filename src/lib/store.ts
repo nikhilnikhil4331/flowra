@@ -25,8 +25,13 @@ export function defaultAppData(): AppData {
     dailyLogs: [],
     meals: [],
     reminders: [
-      { id: 'reminder_daily_log', type: 'daily_log', title: 'A gentle daily check-in', enabled: true, time: '20:00', createdAt: nowIso() },
-      { id: 'reminder_water', type: 'water', title: 'Hydration check-in', enabled: false, time: '13:00', createdAt: nowIso() },
+      { id: 'reminder_period', type: 'period', title: 'Period Reminder', enabled: true, time: '09:00', daysBefore: 3, repeat: 'every_cycle', createdAt: nowIso() },
+      { id: 'reminder_ovulation', type: 'appointment', title: 'Ovulation Reminder', enabled: true, time: '09:00', daysBefore: 1, repeat: 'every_cycle', createdAt: nowIso() },
+      { id: 'reminder_daily_log', type: 'daily_log', title: 'Symptom Check-in', enabled: true, time: '20:00', repeat: 'daily', createdAt: nowIso() },
+      { id: 'reminder_medication', type: 'medication', title: 'Medicine Reminder', enabled: true, time: '09:00', createdAt: nowIso() },
+      { id: 'reminder_water', type: 'water', title: 'Water Reminder', enabled: false, time: '13:00', repeat: 'daily', createdAt: nowIso() },
+      { id: 'reminder_nutrition', type: 'nutrition', title: 'Nutrition Reminder', enabled: true, time: '13:00', repeat: 'daily', createdAt: nowIso() },
+      { id: 'reminder_sleep', type: 'sleep', title: 'Sleep Reminder', enabled: false, time: '22:00', repeat: 'daily', createdAt: nowIso() },
     ],
     medications: [],
     consent: {

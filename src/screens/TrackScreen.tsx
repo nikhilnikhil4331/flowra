@@ -127,7 +127,7 @@ export function TrackScreen({ logs, onSave, onDelete, onOpenFlowGuide, onOpenBod
     {safetyAlerts.map((alert) => <Notice key={alert.id} tone={alert.severity === 'urgent' ? 'urgent' : alert.severity === 'soon' ? 'warning' : 'info'}><div className="safety-notice"><AlertTriangle size={20} /><div><strong>{alert.title}</strong><span>{alert.message}</span><small>{alert.action}</small></div></div></Notice>)}
 
     <Card className="mood-card">
-      <div className="card-title-row"><div><h2>How are you feeling emotionally?</h2><p>Choose the closest fit. You can leave this blank.</p></div><Smile size={22} /></div>
+      <div className="card-title-row"><div><h2>Mood</h2><p>Choose the closest fit.</p></div><Smile size={22} /></div>
       <div className="mood-options" role="group" aria-label="Mood">
         {moods.map((mood) => <button type="button" key={mood.id} onClick={() => update('mood', form.mood === mood.id ? undefined : mood.id)} aria-pressed={form.mood === mood.id} className={`mood-option ${form.mood === mood.id ? 'is-selected' : ''}`}><Chibi mood={mood.id} size="xs" />{mood.label}</button>)}
       </div>
@@ -135,7 +135,6 @@ export function TrackScreen({ logs, onSave, onDelete, onOpenFlowGuide, onOpenBod
 
     <Card className="symptoms-card"><div className="card-title-row"><div><h2>Physical Symptoms</h2><p>Select all that apply.</p></div><Sparkles size={21} /></div><div className="symptom-grid">{symptoms.map((symptom) => <button type="button" key={symptom.id} onClick={() => selectedSymptoms(symptom.id)} aria-pressed={form.symptoms.includes(symptom.id)} className={`symptom-option ${form.symptoms.includes(symptom.id) ? 'is-selected' : ''}`}><Chibi mood={symptom.id === 'cramps' ? 'anxious' : 'calm'} size="xs" />{symptom.label}</button>)}</div></Card>
     <Card className="myflo-flow-score-card"><ScoreSlider label="Flow Score" helper="Luteal symptoms" value={form.painScore} onChange={(value) => update('painScore', value)} lowLabel="0" highLabel="10" icon={<Droplet size={19} fill="currentColor" />} /></Card>
-    <button className="myflo-body-tracker-link" onClick={onOpenBodyTracker}>Continue to Body Tracker <ChevronRight size={16} /></button>
 
     <div className="track-grid">
       <Card className="pain-card">
@@ -166,5 +165,6 @@ export function TrackScreen({ logs, onSave, onDelete, onOpenFlowGuide, onOpenBod
     <Card className="notes-card"><div className="card-title-row"><div><h2>Anything else to remember?</h2><p>Optional private note · up to 500 characters</p></div><NotebookPen size={21} /></div><textarea value={form.notes} onChange={(event) => update('notes', event.target.value.slice(0, 500))} rows={4} maxLength={500} placeholder="How has today felt? What seemed to help?" /><span className="character-count">{form.notes?.length ?? 0}/500</span></Card>
 
     <Card className="save-log-card"><div><span className="metric-icon metric-icon--rose"><Lightbulb size={20} /></span><div><h2>Your daily summary</h2><p>{buildDailySummary(form, logs.filter((entry) => entry.date !== date))}</p></div></div><div><p className="fine-print">Saving records exactly what you entered. It does not infer a diagnosis or send data to an AI service.</p>{saved && <Notice tone="success"><Check size={17} /> Your private daily log was saved.</Notice>}<Button onClick={save}><Check size={18} /> {existing ? 'Update daily log' : 'Save daily log'}</Button>{existing && <Button variant="ghost" className="myflo-delete-log" onClick={() => { if (window.confirm('Delete this daily check-in? This cannot be undone.')) { onDelete(existing.id); onBack() } }}><Trash2 size={15} /> Delete this log</Button>}</div></Card>
+    <button className="myflo-body-tracker-link" onClick={onOpenBodyTracker}>Continue to Body Tracker <ChevronRight size={16} /></button>
   </div>
 }

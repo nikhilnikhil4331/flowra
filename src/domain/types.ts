@@ -102,6 +102,7 @@ export interface Reminder {
   enabled: boolean
   time: string
   daysBefore?: number
+  repeat?: 'every_cycle' | 'once' | 'daily'
   quietHoursStart?: string
   quietHoursEnd?: string
   lastNotifiedAt?: string
@@ -133,6 +134,10 @@ export interface UserProfile {
   cycleIsIrregular: boolean
   averageCycleLength?: number
   periodDuration?: number
+  birthDate?: string
+  heightCm?: number
+  weightKg?: number
+  goals?: string[]
   timezone: string
   setupComplete: boolean
 }

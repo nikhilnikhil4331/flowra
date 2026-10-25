@@ -47,39 +47,32 @@ export function PeriodLogScreen({ logs, onSaveCycle, onSaveLog, onBack }: {
   onBack: () => void
 }) {
   const [startDate, setStartDate] = useState(todayKey())
-  const [length, setLength] = useState(5)
+  const [endDate, setEndDate] = useState(() => addDays(todayKey(), 4))
   const [bleeding, setBleeding] = useState<BleedingLevel>('moderate')
-  const [flowColor, setFlowColor] = useState<FlowColor>('orange_unusual')
+  const [flowColor, setFlowColor] = useState<FlowColor>('dark_red')
+  const [symptoms, setSymptoms] = useState<DailyLog['symptoms']>([])
   const [saved, setSaved] = useState(false)
-  const endDate = addDays(startDate, Math.max(0, length - 1))
   const intensity: { id: BleedingLevel; label: string; drops: number }[] = [
     { id: 'light', label: 'Light', drops: 1 }, { id: 'moderate', label: 'Moderate', drops: 2 }, { id: 'heavy', label: 'Heavy', drops: 3 },
   ]
-
+  const symptomOptions: { id: DailyLog['symptoms'][number]; label: string }[] = [{ id: 'cramps', label: 'Cramps' }, { id: 'bloating', label: 'Bloating' }, { id: 'headache', label: 'Headache' }]
   const save = () => {
     const stamp = nowIso()
-    onSaveCycle({ id: createId('cycle'), startDate, endDate, createdAt: stamp, updatedAt: stamp })
+    onSaveCycle({ id: createId('cycle'), startDate, endDate: endDate || undefined, createdAt: stamp, updatedAt: stamp })
     const existing = logs.find((entry) => entry.date === startDate)
-    onSaveLog({ ...(existing ?? newLog(startDate)), bleeding, flowColor, updatedAt: stamp })
+    onSaveLog({ ...(existing ?? newLog(startDate)), bleeding, flowColor, symptoms, updatedAt: stamp })
     setSaved(true)
   }
-
+  const selectSymptom = (id: DailyLog['symptoms'][number]) => setSymptoms((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id])
   return <div className="screen reference-screen period-log-screen">
     <ReferenceHeader title="Log Period" onBack={onBack} action={<button className="reference-page-header__action reference-page-header__action--pink" aria-label="Private log"><LockKeyhole size={15} /></button>} />
-    <section className="period-log-hero">
-      <div className="period-log-hero__copy"><h2>Track your flow</h2><p>A short check-in helps Myflo show patterns over time.</p></div>
-      <img className="period-log-hero__art" src="/assets/period-chibi.png" alt="" aria-hidden="true" />
-    </section>
-    <section className="period-date-panel" aria-label="Period date">
-      <div className="period-date-panel__header"><strong>Start Date</strong><small>When bleeding started</small></div>
-      <label className="period-date-input"><span>{dateLabel(startDate)}</span><input type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} aria-label="Period start date" /></label>
-      <div className="period-date-end"><span>{dateLabel(endDate)}</span><small>Estimated end</small></div>
-      <div className="period-lengths" aria-label="Period length">{[3, 4, 5, 6, 7].map((value) => <button type="button" key={value} className={length === value ? 'is-selected' : ''} onClick={() => setLength(value)}>{value} days</button>)}</div>
-    </section>
-    <section className="period-log-section"><strong>Flow Intensity</strong><div className="period-intensity-grid">{intensity.map((item) => <button type="button" key={item.id} className={`period-intensity ${bleeding === item.id ? 'is-selected' : ''}`} onClick={() => setBleeding(item.id)}>{Array.from({ length: item.drops }, (_, index) => <Droplet key={index} size={15} fill="currentColor" />)}<span>{item.label}</span></button>)}</div></section>
+    <section className="period-log-art"><img src="/assets/period-chibi.png" alt="" aria-hidden="true" /></section>
+    <section className="period-reference-fields"><strong>Start Date</strong><label><input type="date" value={startDate} onChange={(event) => { setStartDate(event.target.value); if (!endDate || endDate < event.target.value) setEndDate(addDays(event.target.value, 4)) }} /><span>{dateLabel(startDate)}</span><Clock3 size={14} /></label><label><input type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} /><span>{endDate ? dateLabel(endDate) : 'Add end date'}</span><X size={13} /></label></section>
+    <section className="period-log-section"><strong>Flow Intensity</strong><div className="period-intensity-grid">{intensity.map((item) => <button type="button" key={item.id} className={`period-intensity ${bleeding === item.id ? 'is-selected' : ''}`} onClick={() => setBleeding(item.id)}>{Array.from({ length: item.drops }, (_, index) => <Droplet key={index} size={16} fill="currentColor" />)}<span>{item.label}</span></button>)}</div></section>
     <section className="period-log-section"><strong>Flow Color</strong><div className="period-color-grid">{colorOptions.map((item) => <button type="button" key={item.id} className={`period-color-choice ${flowColor === item.id ? 'is-selected' : ''}`} onClick={() => setFlowColor(item.id)}><i style={{ '--drop-color': item.shade } as CSSProperties} /><span>{item.label}</span></button>)}</div></section>
-    {saved && <MiniNotice tone="lavender"><span>Saved privately on this device. You can edit your daily log anytime.</span></MiniNotice>}
-    <button className="period-save-button" onClick={save}><Sparkles size={15} />Save period</button>
+    <section className="period-log-section period-log-section--symptoms"><strong>Any Symptoms?</strong><div className="period-chip-row">{symptomOptions.map((item) => <button key={item.id} className={`period-chip ${symptoms.includes(item.id) ? 'is-selected' : ''}`} onClick={() => selectSymptom(item.id)}>{item.label}</button>)}</div></section>
+    {saved && <MiniNotice tone="lavender"><span>Saved privately on this device.</span></MiniNotice>}
+    <button className="period-save-button" onClick={save}>Save</button>
   </div>
 }
 
@@ -157,8 +150,7 @@ export function NutritionResultScreen({ preview, onBack, onSave, onSaved, onAddA
     {error && <MiniNotice tone="peach"><span>{error}</span></MiniNotice>}
     <label className="nutrition-portion-picker"><span>Portion Size</span><select value={portion} onChange={(event) => setPortion(event.target.value)}><option>1 bowl (250g)</option><option>Half bowl (125g)</option><option>Large bowl (350g)</option></select></label>
     <p className="nutrition-result-label">Nutrition (Estimated)</p>
-    <section className="nutrition-kcal-card"><div><small>Calories</small><strong>{nutrients.calories}<small> kcal</small></strong></div><span><Utensils size={20} /></span></section>
-    <section className="nutrition-macro-grid"><div><strong>{nutrients.proteinG}g</strong><small>Protein</small></div><div><strong>{nutrients.carbsG}g</strong><small>Carbs</small></div><div><strong>{nutrients.fatG}g</strong><small>Fat</small></div><div><strong>{nutrients.fiberG}g</strong><small>Fiber</small></div><div><strong>{nutrients.zincMg}mg</strong><small>Zinc</small></div><div><strong>{nutrients.ironMg}mg</strong><small>Iron</small></div><div><strong>{nutrients.calciumMg}mg</strong><small>Calcium</small></div><div><strong>{nutrients.vitaminB12McG}µg</strong><small>B12</small></div></section>
+    <section className="nutrition-reference-grid"><div><strong>{nutrients.calories}</strong><small>Calories</small></div><div><strong>{nutrients.proteinG}g</strong><small>Protein</small></div><div><strong>{nutrients.carbsG}g</strong><small>Carbs</small></div><div><strong>{nutrients.fatG}g</strong><small>Fat</small></div><div><strong>{nutrients.fiberG}g</strong><small>Fiber</small></div><div><strong>{nutrients.zincMg}mg</strong><small>Zinc</small></div><div><strong>{nutrients.ironMg}mg</strong><small>Iron</small></div><div><strong>{nutrients.calciumMg}mg</strong><small>Calcium</small></div><div><strong>{nutrients.vitaminB12McG}µg</strong><small>B12</small></div></section>
     {editing && <div className="nutrition-result-edit-grid">{editor.map((item) => <label key={item.key}>{item.label}<input type="number" min="0" step="0.1" value={nutrients[item.key] ?? 0} onChange={(event) => change(item.key, event.target.value)} /><small>{item.suffix}</small></label>)}</div>}
     <p className="reference-fine-print">Estimates may vary based on portion size and ingredients.</p>
     <div className="nutrition-result-note"><img src="/assets/home-chibi.png" alt="" /><div><strong>Good choice!</strong><span>High in protein and rich in fiber.</span></div></div>
@@ -208,7 +200,8 @@ export function FlowColorScreen({ logs, onSave, onBack, onOpenGuide }: { logs: D
     <div className="flow-color-droplets">{flowChoices.map((item) => <button key={item.id} className={`flow-color-droplet ${selected === item.id ? 'is-selected' : ''}`} onClick={() => choose(item.id)}><i className="flow-color-droplet__shape" style={{ '--drop-color': item.shade } as CSSProperties} /><span>{item.label}</span></button>)}</div>
     <section className="flow-color-result"><span className="flow-color-result__drop"><Droplet size={31} fill="currentColor" /></span><div><h2>{option.label}</h2><p>{option.detail}</p></div></section>
     <section className="flow-color-signals"><h2>Possible reasons</h2>{option.reasons.map((reason) => <div className="flow-color-signal" key={reason}><span>•</span><p>{reason}</p></div>)}</section>
-    <MiniNotice tone="peach"><span>Colour alone cannot diagnose an infection, iron deficiency, or hormone condition. Severe pain, fainting, breathing trouble, or possible pregnancy with pain or bleeding needs urgent assessment.</span></MiniNotice>
+    <section className="flow-color-doctor"><h2><CircleAlert size={14} />When to consult a doctor?</h2><p>• If bleeding is very heavy</p><p>• If it lasts longer than usual</p><p>• If you have severe pain, fainting, breathing trouble, or possible pregnancy with pain or bleeding</p></section>
+    <p className="reference-fine-print">Colour alone cannot diagnose an infection, iron deficiency, or hormone condition.</p>
     <button className="flow-color-guide-button" onClick={onOpenGuide}><BookOpen size={15} />Open Flow Guide</button>
   </div>
 }
@@ -230,7 +223,6 @@ export function MedicineCareScreen({ medications, onBack, onAdd, onDelete }: { m
   return <div className="screen reference-screen medicine-care-screen">
     <ReferenceHeader title="Medicine & Care" onBack={onBack} />
     <div className="medicine-tab-row" role="tablist"><button className={tab === 'recommended' ? 'is-selected' : ''} onClick={() => setTab('recommended')}>Recommended</button><button className={tab === 'mine' ? 'is-selected' : ''} onClick={() => setTab('mine')}>My Medicine</button><button className={tab === 'relief' ? 'is-selected' : ''} onClick={() => setTab('relief')}>Pain Relief</button></div>
-    {tab !== 'mine' && <MiniNotice tone="blue"><span>General information only — not a prescription. Check labels, your own clinician’s advice, and avoid overlapping active ingredients.</span></MiniNotice>}
     {items.length === 0 ? <div className="medicine-empty"><Pill size={25} /><strong>No medicine records yet</strong><span>Use “Add Medicine” to record a medicine you already use.</span></div> : <div className="medicine-card-list">{items.map((item) => <article className={`medicine-care-card medicine-care-card--${item.tone}`} key={item.id ?? item.title}><span className="medicine-care-card__icon"><Pill size={17} /></span><div className="medicine-care-card__copy"><strong>{item.title}</strong><small>{item.copy}</small></div>{item.id ? <button onClick={() => onDelete(item.id!)} aria-label={`Delete ${item.title}`}><Trash2 size={13} /></button> : <ChevronRight size={16} />}</article>)}</div>}
     <div className="medicine-safety"><AlertTriangle size={17} /><div><strong>Remember</strong><p>Always consult a doctor before starting any medication.</p></div></div>
     {tab === 'mine' && <button className="medicine-care-add" onClick={onAdd}><Plus size={16} />Add Medicine</button>}
@@ -254,7 +246,6 @@ export function AddMedicineScreen({ onBack, onSave, onAddReminder }: { onBack: (
   }
   return <div className="screen reference-screen add-medicine-screen">
     <ReferenceHeader title="Add Medicine" onBack={onBack} action={<img className="add-medicine-header-art" src="/assets/medicine-chibi.png" alt="" aria-hidden="true" />} />
-    <p className="add-medicine-intro">Log medicines you already use. Myflo does not choose a regimen for you.</p>
     <div className="add-medicine-form">
       <label className="add-medicine-field"><span>Medicine Name</span><input value={name} onChange={(event) => setName(event.target.value)} placeholder="e.g. Ibuprofen" autoComplete="off" /></label>
       <label className="add-medicine-field"><span>Dose</span><input value={dose} onChange={(event) => setDose(event.target.value)} placeholder="e.g. 400 mg" autoComplete="off" /></label>
@@ -264,7 +255,7 @@ export function AddMedicineScreen({ onBack, onSave, onAddReminder }: { onBack: (
       <label className="add-medicine-field"><span>Repeat</span><select value={repeat} onChange={(event) => setRepeat(event.target.value)}><option>Only this cycle</option><option>Daily</option><option>As needed</option></select></label>
     </div>
     {error && <MiniNotice tone="peach"><span>{error}</span></MiniNotice>}
-    <div className="add-medicine-disclaimer"><CircleAlert size={13} /><span>For tracking and reminders only. Follow your own clinician or label instructions; do not combine medicines with overlapping active ingredients without advice.</span></div>
     <button className="add-medicine-save" onClick={save}><Pill size={15} />Save Medicine</button>
+    <div className="add-medicine-disclaimer"><CircleAlert size={13} /><span>For tracking and reminders only. Follow your own clinician or label instructions; do not combine medicines with overlapping active ingredients without advice.</span></div>
   </div>
 }

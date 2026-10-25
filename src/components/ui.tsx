@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes, PropsWithChildren, ReactNode } from 'react'
 import { CalendarDays, ChartNoAxesCombined, Droplet, Home, Menu, NotebookPen, Pill as PillIcon, Plus, ScanLine, Stethoscope, X } from 'lucide-react'
 
 export type PrimaryView = 'home' | 'calendar' | 'track' | 'insights' | 'more'
-export type AppView = PrimaryView | 'periodLog' | 'bodyTracker' | 'foodScanner' | 'nutritionResult' | 'dailyNutrition' | 'flowColor' | 'flowGuide' | 'medicineCare' | 'addMedicine'
+export type AppView = PrimaryView | 'periodLog' | 'bodyTracker' | 'foodScanner' | 'nutritionResult' | 'dailyNutrition' | 'flowColor' | 'flowGuide' | 'medicineCare' | 'addMedicine' | 'reminders' | 'reminderDetail' | 'myfloAi' | 'reports' | 'settings' | 'data'
 export type QuickAction = 'period' | 'symptoms' | 'food' | 'medicine' | 'note'
 
 export function BrandMark({ compact = false }: { compact?: boolean }) {
@@ -57,7 +57,7 @@ const navItems: { id: Exclude<PrimaryView, 'track'>; label: string; icon: typeof
 ]
 
 export function AppNavigation({ current, onNavigate, onQuickAction }: { current: AppView; onNavigate: (view: AppView) => void; onQuickAction: () => void }) {
-  const section: PrimaryView = current === 'periodLog' ? 'calendar' : current === 'bodyTracker' ? 'track' : ['foodScanner', 'nutritionResult', 'dailyNutrition'].includes(current) ? 'insights' : ['flowColor', 'flowGuide', 'medicineCare', 'addMedicine'].includes(current) ? 'more' : current as PrimaryView
+  const section: PrimaryView = current === 'periodLog' ? 'calendar' : current === 'bodyTracker' ? 'track' : ['foodScanner', 'nutritionResult', 'dailyNutrition', 'myfloAi', 'reports'].includes(current) ? 'insights' : ['flowColor', 'flowGuide', 'medicineCare', 'addMedicine', 'reminders', 'reminderDetail', 'settings', 'data'].includes(current) ? 'more' : current as PrimaryView
   return <nav className="bottom-nav myflo-bottom-nav" aria-label="Main navigation">
     {navItems.slice(0, 2).map(({ id, label, icon: Icon }) => <button key={id} className={section === id ? 'is-active' : ''} onClick={() => onNavigate(id)} aria-current={section === id ? 'page' : undefined}><span><Icon size={20} strokeWidth={section === id ? 2.45 : 1.8} /></span><small>{label}</small></button>)}
     <button className={`quick-add ${section === 'track' ? 'is-active' : ''}`} onClick={onQuickAction} aria-label="Open quick actions" aria-haspopup="dialog"><span><Plus size={28} strokeWidth={2.2} /></span></button>

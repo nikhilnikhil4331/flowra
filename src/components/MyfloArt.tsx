@@ -20,6 +20,7 @@ export function FloralLineArt({ position = 'top-right' }: { position?: 'top-righ
 }
 
 export function MobileStatusBar() {
-  const time = new Intl.DateTimeFormat('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date())
+  // Fixed reference chrome keeps every Myflo screen aligned with the supplied UI specification.
+  const time = '09:41'
   return <div className="mobile-statusbar" aria-hidden="true"><strong>{time}</strong><span><Signal size={15} fill="currentColor" /><Wifi size={15} /><BatteryFull size={18} fill="currentColor" /></span></div>
 }
