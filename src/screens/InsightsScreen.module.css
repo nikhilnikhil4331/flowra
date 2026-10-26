@@ -1,0 +1,15 @@
+.root { position: absolute; inset: 0; display: flex; flex-direction: column; overflow: hidden; }
+.scroll { position: relative; z-index: 1; flex: 1; overflow-y: auto; scrollbar-width: none; padding: 0 20px 112px; }
+.scroll::-webkit-scrollbar { display: none; }
+.header { position: relative; z-index: 2; display: flex; align-items: center; justify-content: center; gap: 8px; height: 50px; padding: 4px 20px 0; }
+.title { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+.hero { margin-top: 16px; border-radius: 22px; padding: 18px 16px; background: linear-gradient(120deg, #fff1f6, #fdeaf4); }
+.hero h2 { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: -0.2px; }
+.hero p { margin: 6px 0 0; font-size: 12.5px; color: #554e60; }
+.card { margin-top: 12px; background: #fff; border-radius: 22px; padding: 14px; box-shadow: 0 2px 14px rgba(226,183,195,.12); }
+.card h3 { margin: 0 0 4px; font-size: 15px; font-weight: 700; letter-spacing: -0.2px; }
+.stats { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 10px; }
+.stats li { display: flex; align-items: baseline; gap: 8px; }
+.stats strong { font-size: 20px; font-weight: 800; color: #f0336b; }
+.stats span { font-size: 12.5px; color: #554e60; }
+.disclaimer { margin: 14px 2px 0; font-size: 10.5px; line-height: 1.5; color: #857e90; }

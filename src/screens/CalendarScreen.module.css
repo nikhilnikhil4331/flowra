@@ -1,0 +1,365 @@
+.root {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.scroll {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  padding: 0 20px 112px;
+}
+.scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* header */
+.header {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 20px 0;
+  height: 46px;
+  flex: 0 0 auto;
+}
+
+.back {
+  position: absolute;
+  left: 20px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid #2c2438;
+  display: grid;
+  place-items: center;
+  color: #221b2f;
+  background: rgba(255, 255, 255, 0.55);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.back:active {
+  transform: scale(0.94);
+}
+
+.title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+/* month card */
+.monthCard {
+  margin-top: 14px;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 2px 14px rgba(226, 183, 195, 0.14);
+  overflow: hidden;
+  animation: fade-up 380ms var(--ease-out) both;
+}
+
+.monthHead {
+  display: grid;
+  grid-template-columns: 34px 1fr 34px;
+  align-items: center;
+  padding: 11px 12px 0;
+  height: 46px;
+  background: #fee8da;
+}
+
+.chev {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  color: #221b2f;
+  border-radius: 50%;
+  transition: background var(--dur-fast);
+}
+.chev:active {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.monthTitle {
+  margin: 0;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.weekRow {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 6px 4px 4px;
+  background: #fee8da;
+}
+
+.weekRow span {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 500;
+  color: #4a4356;
+}
+
+.weekRow .weekActive {
+  font-weight: 800;
+  color: #221b2f;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-auto-rows: 43px;
+  padding: 11px 4px 22px;
+}
+
+.cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 8px;
+  gap: 2px;
+  border-radius: 14px;
+  transition: background var(--dur-fast) var(--ease-out);
+}
+
+.cell:active {
+  background: #fdf4f6;
+}
+
+.dayNum {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #2c2438;
+  letter-spacing: 0.1px;
+  line-height: 1;
+}
+
+.cellMuted .dayNum {
+  color: #c7c0cd;
+}
+
+/* period day: solid pink disc */
+.cellSelected {
+  background: #fe6291;
+  width: 34px;
+  height: 34px;
+  justify-self: center;
+  border-radius: 50%;
+  padding-top: 9px;
+  box-shadow: 0 4px 10px rgba(254, 98, 145, 0.3);
+  animation: pop-in 260ms var(--ease-out);
+}
+
+.cellSelected .dayNum {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.cellSelected .marks {
+  display: none;
+}
+
+.cellToday::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 50%;
+  border: 1.5px solid #fe6291;
+}
+
+.cellToday.cellSelected::before {
+  display: none;
+}
+
+/* fertile window band */
+.cellFertileRow::after {
+  content: '';
+  position: absolute;
+  inset: 2px -2px;
+  border-radius: 12px;
+  background: #f3f1fe;
+  z-index: -1;
+}
+
+.marks {
+  display: flex;
+  gap: 2px;
+  height: 5px;
+  align-items: center;
+  justify-content: center;
+}
+
+.dotPeriod,
+.dotFertile,
+.dotOvulation {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  display: block;
+}
+
+.dotPeriod {
+  background: #ffc38f;
+}
+.dotFertile {
+  background: #b9a9fd;
+}
+.dotOvulation {
+  background: #d48cfb;
+}
+
+/* legend */
+.legend {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin: 14px 0 0;
+  padding: 0 2px;
+  flex-wrap: wrap;
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #3b3548;
+}
+
+.legendDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.legendSquare {
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+}
+
+/* sections */
+.sectionTitle {
+  margin: 26px 0 12px;
+  font-size: 16.5px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.events {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 9px;
+}
+
+.event {
+  height: 78px;
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: #2c2438;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.event:active {
+  transform: scale(0.96);
+}
+
+.event img {
+  width: 26px;
+  height: 30px;
+  object-fit: contain;
+}
+
+.lav {
+  background: var(--lav-100);
+}
+.peach {
+  background: #feebe0;
+}
+.blush {
+  background: #fee4eb;
+}
+.blue {
+  background: var(--blue-100);
+}
+
+/* notes */
+.noteCard,
+.noteEmpty {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 2px 12px rgba(226, 183, 195, 0.12);
+  text-align: left;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.noteCard:active,
+.noteEmpty:active {
+  transform: scale(0.994);
+}
+
+.noteEmpty {
+  align-items: center;
+  color: #857e90;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.noteIcon {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  background: #fff0f4;
+  color: #f9749b;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  transform: rotate(-6deg);
+}
+
+.noteBody {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.noteText {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #221b2f;
+  line-height: 1.35;
+}
+
+.noteTime {
+  font-size: 12px;
+  font-weight: 400;
+  color: #857e90;
+}
+
+/* scoped copies — CSS Modules rewrites animation-name per module */
+@keyframes pop-in { 0% { opacity: 0; transform: scale(0.86); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes fade-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }

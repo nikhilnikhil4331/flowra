@@ -1,0 +1,108 @@
+.wrap {
+  position: relative;
+  width: 327.4px;
+  height: 327.4px;
+  margin: 0 auto;
+}
+
+.svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  display: block;
+}
+
+/* band fades/sweeps in once, then stays put */
+.band {
+  opacity: 0;
+  transform-origin: 50% 50%;
+  animation: band-in 620ms var(--ease-out) 80ms forwards;
+}
+
+@keyframes band-in {
+  from {
+    opacity: 0;
+    transform: rotate(-7deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.badge {
+  opacity: 0;
+  animation: pop-in 420ms var(--ease-out) 260ms forwards;
+}
+
+.badgeIcon {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+}
+
+.badgeIcon img {
+  width: 19px;
+  height: auto;
+  display: block;
+}
+
+.caption {
+  fill: #ffffff;
+  font-size: 14.5px;
+  font-weight: 600;
+  letter-spacing: 0.9px;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.centre text {
+  font-family: var(--font);
+}
+
+.day {
+  font-size: 23.5px;
+  font-weight: 800;
+  fill: #221b2f;
+  letter-spacing: -0.4px;
+}
+
+.phase {
+  font-size: 14px;
+  font-weight: 500;
+  fill: #2c2438;
+}
+
+.note {
+  font-size: 11.5px;
+  font-weight: 400;
+  fill: #6e6879;
+}
+
+.centre {
+  animation: fade-in 500ms var(--ease-out) both;
+  animation-delay: 160ms;
+}
+
+@media (max-width: 359px) {
+  .wrap {
+    width: 292px;
+    height: 292px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .band,
+  .cap,
+  .badge,
+  .centre {
+    opacity: 1;
+    animation: none;
+    transform: none;
+  }
+}
+
+/* scoped copies — CSS Modules rewrites animation-name per module */
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pop-in { 0% { opacity: 0; transform: scale(0.86); } 100% { opacity: 1; transform: scale(1); } }

@@ -1,0 +1,309 @@
+.root {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.scroll {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  padding-bottom: 104px;
+}
+.scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* ------------------------------------------------------------------ header */
+.header {
+  position: relative;
+  z-index: 2;
+  height: 112px;
+  flex: 0 0 auto;
+}
+
+.iconBtn {
+  position: absolute;
+  left: 32.9px;
+  top: 26.3px;
+  width: 28px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  color: #2c2438;
+}
+
+.greetingBlock {
+  position: absolute;
+  left: 81.5px;
+  top: 23px;
+  min-width: 0;
+}
+
+.greeting {
+  margin: 0;
+  font-size: 23.6px;
+  font-weight: 800;
+  letter-spacing: -0.35px;
+  line-height: 1.12;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.flower {
+  display: inline-flex;
+  transform: translateY(-1px);
+}
+
+.subtitle {
+  margin: 5.5px 0 0;
+  font-size: 15.5px;
+  font-weight: 400;
+  color: #3b3548;
+  letter-spacing: -0.05px;
+  white-space: nowrap;
+}
+
+.bell {
+  position: absolute;
+  left: 322.4px;
+  top: 25.6px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid #2c2438;
+  display: grid;
+  place-items: center;
+  color: #221b2f;
+  background: rgba(255, 255, 255, 0.5);
+  transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast);
+}
+.bell:active {
+  transform: scale(0.94);
+  background: #fff;
+}
+
+/* -------------------------------------------------------------------- ring */
+.ringWrap {
+  position: relative;
+  margin: 0 auto;
+  width: 327.4px;
+  height: 327.4px;
+  display: grid;
+  place-items: center;
+  animation: fade-in 420ms var(--ease-out) both;
+}
+
+/* --------------------------------------------------------------- next card */
+/* card: 373 x 141 at y 485.7, sitting just under the dial */
+.nextCard {
+  position: relative;
+  display: block;
+  width: calc(100% - 17px);
+  margin: 0.3px auto 0;
+  height: 141px;
+  border-radius: 26px;
+  border: 1px solid var(--border);
+  background: linear-gradient(118deg, #fff6f9 0%, #fff2f7 52%, #ffeef5 100%);
+  text-align: left;
+  overflow: hidden;
+  box-shadow: var(--sh-card);
+  transition: transform var(--dur) var(--ease-out);
+}
+.nextCard:active {
+  transform: scale(0.992);
+}
+
+/* drop glyph: 22 x 32 with its top at y 557.3 (card-relative 71.6) */
+.nextDrop {
+  position: absolute;
+  left: 42.1px;
+  top: 71.6px;
+  width: 22px;
+  height: 32px;
+  pointer-events: none;
+}
+
+.nextText {
+  position: absolute;
+  left: 79px;
+  top: 53px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.nextLabel {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.1;
+  color: #3b3548;
+  letter-spacing: -0.55px;
+}
+
+.nextDate {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+  color: var(--ink);
+  margin-top: 6.5px;
+}
+
+.nextIn {
+  font-size: 12.3px;
+  font-weight: 400;
+  line-height: 1.1;
+  color: #554e60;
+  margin-top: 5.5px;
+}
+
+.nextArt {
+  position: absolute;
+  right: -2px;
+  bottom: -10px;
+  width: 132px;
+  height: auto;
+  pointer-events: none;
+}
+
+.sparkles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.sparkles i {
+  position: absolute;
+  width: 4.5px;
+  height: 4.5px;
+  background: #ffc2d2;
+  transform: rotate(45deg);
+}
+.sparkles i:nth-child(1) {
+  left: 66px;
+  top: 44px;
+  width: 5px;
+  height: 5px;
+}
+.sparkles i:nth-child(2) {
+  left: 84px;
+  top: 39px;
+  width: 3.5px;
+  height: 3.5px;
+}
+.sparkles i:nth-child(3) {
+  left: 33px;
+  top: 104px;
+  background: #ffb0c6;
+}
+
+/* ------------------------------------------------------------- quick cards */
+.quickRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4.6px;
+  padding: 0 9.5px;
+  margin-top: 31.3px;
+}
+
+.quick {
+  position: relative;
+  padding-top: 5px;
+  height: 177px;
+  border-radius: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform var(--dur) var(--ease-out);
+}
+.quick:active {
+  transform: translateY(2px) scale(0.985);
+}
+
+.quickMood {
+  background: #fee5d4;
+  height: 176px;
+  margin-top: 2.7px;
+}
+.quickCramps {
+  background: #feddec;
+  height: 179px;
+}
+.quickMed {
+  background: #e3f4fe;
+  height: 177px;
+  margin-top: 2.1px;
+}
+
+/* the white "window" the illustration sits in */
+.quickArt {
+  width: calc(100% - 4px);
+  height: 78px;
+  border-radius: 24px 24px 48% 48% / 24px 24px 62% 62%;
+  background: #ffffff;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding-bottom: 4px;
+}
+
+.quickArt img {
+  width: 50px;
+  height: 58px;
+  object-fit: contain;
+}
+
+.quickMed .quickArt img {
+  width: 46px;
+  height: 38px;
+}
+
+.quickTitle {
+  margin-top: 8px;
+  font-size: 17.5px;
+  font-weight: 700;
+  letter-spacing: -0.9px;
+  color: var(--ink);
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.95), 0 0 4px rgba(255, 255, 255, 0.6);
+}
+
+.quickMood .quickTitle,
+.quickMood .quickSub {
+  transform: translateX(3.2px);
+}
+
+.quickSub {
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.32;
+  letter-spacing: -0.25px;
+  color: #6f6879;
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.9);
+  max-width: 100px;
+}
+
+@media (max-width: 359px) {
+  .ringWrap {
+    width: 300px;
+    height: 300px;
+  }
+  .greeting {
+    font-size: 21px;
+  }
+  .subtitle {
+    font-size: 14px;
+  }
+}
+
+/* scoped copies — CSS Modules rewrites animation-name per module */
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }

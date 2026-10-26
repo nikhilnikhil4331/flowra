@@ -1,0 +1,71 @@
+.wrap {
+  position: relative;
+  margin: 6px 0 0;
+  animation: fade-in 420ms var(--ease-out) both;
+}
+
+.svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+.axis {
+  font-size: 10.5px;
+  font-weight: 400;
+  fill: #6e6879;
+  font-family: var(--font);
+}
+
+.bandTag text {
+  font-size: 10px;
+  font-weight: 600;
+  fill: #5b4f8a;
+  font-family: var(--font);
+}
+
+.point {
+  cursor: pointer;
+  transition: opacity var(--dur-fast);
+}
+
+.point circle {
+  transition: r var(--dur) var(--ease-out);
+}
+
+.point:hover circle:first-child {
+  opacity: 0.85;
+}
+
+.tooltip {
+  position: absolute;
+  transform: translate(-50%, -140%);
+  background: #fff;
+  border: 1px solid #fbd3e0;
+  border-radius: 11px;
+  padding: 5px 11px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #221b2f;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(226, 183, 195, 0.18);
+  pointer-events: none;
+  transition: left var(--dur) var(--ease-out), top var(--dur) var(--ease-out);
+}
+
+.tooltip::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  width: 8px;
+  height: 8px;
+  background: #fff;
+  border-right: 1px solid #fbd3e0;
+  border-bottom: 1px solid #fbd3e0;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+/* scoped copies — CSS Modules rewrites animation-name per module */
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }

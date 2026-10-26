@@ -1,0 +1,10 @@
+.stage {
+  position: absolute;
+  inset: 0;
+  animation: screen-in 280ms var(--ease-out);
+}
+
+@keyframes screen-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}

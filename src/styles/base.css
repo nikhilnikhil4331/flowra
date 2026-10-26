@@ -1,0 +1,224 @@
+/* =========================================================================
+   Base / shell
+   ========================================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  color: var(--ink);
+  background: var(--frame);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--lav-500);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------------------------------------------------------------- frame --- */
+.app-root {
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  background: var(--frame);
+}
+
+.phone {
+  position: relative;
+  width: 100%;
+  max-width: 390px;
+  min-height: 100dvh;
+  background: var(--page);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+@media (min-width: 560px) {
+  .app-root {
+    align-items: center;
+    padding: 18px;
+  }
+  .phone {
+    height: min(920px, calc(100dvh - 36px));
+    min-height: 0;
+    border-radius: 40px;
+    box-shadow:
+      0 0 0 4px #a8aade,
+      0 30px 70px rgba(60, 50, 110, 0.35);
+  }
+}
+
+/* --------------------------------------------------------------- screen --- */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--page);
+}
+
+.screen__scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 118px;
+}
+.screen__scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* page wash + floral decor */
+.page-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: var(--z-decor);
+  background:
+    radial-gradient(120% 60% at 100% 0%, #fff6f8 0%, rgba(255, 246, 248, 0) 60%),
+    linear-gradient(180deg, #fdf9f7 0%, #fcf7f6 40%, #fdfafa 100%);
+}
+
+.decor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: var(--z-decor);
+  overflow: hidden;
+  color: #f6c5cd;
+}
+
+.decor svg {
+  position: absolute;
+}
+
+/* ----------------------------------------------------------- status bar --- */
+.statusbar {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 22px 0 44px;
+  height: 46px;
+  flex: 0 0 auto;
+  color: var(--ink);
+}
+
+.statusbar__time {
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.statusbar__icons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink);
+}
+
+/* ----------------------------------------------------------- animations --- */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.86);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(102%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ring-draw {
+  from {
+    stroke-dashoffset: var(--ring-len);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

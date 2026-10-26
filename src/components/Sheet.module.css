@@ -1,0 +1,258 @@
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-sheet);
+  display: flex;
+  align-items: flex-end;
+  animation: fade-in 180ms var(--ease-out);
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(43, 34, 52, 0.28);
+  border: 0;
+  cursor: default;
+  backdrop-filter: blur(1.5px);
+}
+
+.sheet {
+  position: relative;
+  width: 100%;
+  background: #fffdfc;
+  border-radius: 26px 26px 0 0;
+  padding: 8px 18px calc(18px + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -10px 34px rgba(120, 90, 110, 0.22);
+  animation: sheet-up 300ms var(--ease-out);
+  max-height: 84%;
+  overflow-y: auto;
+}
+
+.grabber {
+  width: 42px;
+  height: 4px;
+  border-radius: 2px;
+  background: #ecdfe3;
+  margin: 2px auto 12px;
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.sub {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.close {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #f8eef1;
+  color: #7a7285;
+  display: grid;
+  place-items: center;
+}
+
+.textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: #fff8fa;
+  border-radius: 14px;
+  padding: 12px 13px;
+  font-size: 14px;
+  line-height: 1.45;
+  resize: vertical;
+  min-height: 92px;
+  color: var(--ink);
+}
+.textarea::placeholder {
+  color: #b3abbc;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.primary {
+  flex: 1;
+  height: 46px;
+  border-radius: var(--r-pill);
+  background: linear-gradient(180deg, #ff739c 0%, #f8548a 100%);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.1px;
+  box-shadow: var(--sh-pink);
+  transition: transform var(--dur-fast) var(--ease-out), opacity var(--dur-fast);
+}
+.primary:active {
+  transform: scale(0.985);
+}
+.primary:disabled {
+  opacity: 0.55;
+  box-shadow: none;
+}
+
+.danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 46px;
+  padding: 0 16px;
+  border-radius: var(--r-pill);
+  background: #fdeef1;
+  color: #e0457a;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.field {
+  display: block;
+  margin-bottom: 12px;
+}
+
+.label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-3);
+  margin-bottom: 6px;
+}
+
+.input {
+  width: 100%;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: #fff;
+  padding: 0 12px;
+  font-size: 14px;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  padding: 9px 13px;
+  border-radius: var(--r-pill);
+  background: #fdf2f5;
+  border: 1px solid transparent;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #4a4356;
+  transition: all var(--dur-fast) var(--ease-out);
+}
+
+.chipActive {
+  background: #ffe4ec;
+  border-color: #fba9c4;
+  color: #d63c6e;
+  font-weight: 600;
+}
+
+.menuList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 13px 12px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-2);
+  text-align: left;
+  transition: background var(--dur-fast);
+}
+.menuItem:active {
+  background: #fdf3f6;
+}
+
+.menuIcon {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: #fdeef3;
+  color: #ea5687;
+  flex: 0 0 auto;
+}
+
+.medicineRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 14px;
+  background: #fff7f9;
+  margin-bottom: 8px;
+}
+
+.medicineRow strong {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.medicineRow em {
+  font-style: normal;
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+.medicineRow button {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #fdeef1;
+  color: #e0457a;
+  display: grid;
+  place-items: center;
+}
+
+.empty {
+  list-style: none;
+  font-size: 12.5px;
+  color: var(--ink-4);
+  padding: 8px 4px;
+}
+
+/* scoped copies — CSS Modules rewrites animation-name per module */
+@keyframes sheet-up { from { transform: translateY(102%); } to { transform: none; } }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }

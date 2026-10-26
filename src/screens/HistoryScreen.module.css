@@ -1,0 +1,247 @@
+.root {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.scroll {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  padding: 0 20px 112px;
+}
+.scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.header {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 20px 0;
+  height: 46px;
+  flex: 0 0 auto;
+}
+
+.back {
+  position: absolute;
+  left: 20px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid #2c2438;
+  display: grid;
+  place-items: center;
+  color: #221b2f;
+  background: rgba(255, 255, 255, 0.55);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.back:active {
+  transform: scale(0.94);
+}
+
+.title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+/* tabs */
+.tabs {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: #f4ecec;
+  border-radius: 22px;
+  padding: 4px;
+}
+
+.tab {
+  height: 38px;
+  border-radius: 19px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #5b5464;
+  transition: all var(--dur) var(--ease-out);
+}
+
+.tabOn {
+  background: #ffffff;
+  color: #f0336b;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(214, 168, 180, 0.18);
+}
+
+/* banner */
+.banner {
+  position: relative;
+  margin-top: 14px;
+  height: 84px;
+  border-radius: 22px;
+  background: linear-gradient(100deg, #fdeef7 0%, #fceaf4 60%, #fde9f3 100%);
+  padding: 16px 14px 0 16px;
+  overflow: hidden;
+}
+
+.banner p {
+  margin: 0;
+  max-width: 200px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.42;
+  color: #2b2438;
+}
+
+.banner img {
+  position: absolute;
+  right: 2px;
+  bottom: -4px;
+  width: 100px;
+  height: auto;
+}
+
+/* chart */
+.chartCard {
+  margin-top: 12px;
+  padding: 6px 6px 2px;
+}
+
+/* recent cycles */
+.recent {
+  margin-top: 12px;
+  background: #ffffff;
+  border-radius: 22px;
+  padding: 14px 14px 8px;
+  box-shadow: 0 2px 14px rgba(226, 183, 195, 0.12);
+}
+
+.recentHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.recentHead h2 {
+  margin: 0;
+  font-size: 15.5px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.viewAll {
+  font-size: 12px;
+  font-weight: 600;
+  color: #f0336b;
+}
+
+.recent ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.recent li {
+  display: grid;
+  grid-template-columns: 60px 1fr 92px;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  border-radius: 10px;
+  padding: 0 2px;
+  transition: background var(--dur) var(--ease-out);
+}
+
+.rowHot {
+  background: #fff6f9;
+}
+
+.rowLen {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #221b2f;
+  white-space: nowrap;
+}
+
+.bar {
+  position: relative;
+  height: 10px;
+  border-radius: 6px;
+  background: #f3ecec;
+  overflow: hidden;
+}
+
+.bar i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 6px;
+  background: #ffb5c8;
+  transition: width 400ms var(--ease-out), background var(--dur);
+}
+
+.barHot {
+  background: linear-gradient(90deg, #fe6291, #ff86a6) !important;
+}
+
+.rowDates {
+  font-size: 11.5px;
+  font-weight: 400;
+  color: #554e60;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.moodNote {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #554e60;
+  margin: 0 0 10px;
+}
+
+/* insight */
+.insight {
+  position: relative;
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 6px;
+  margin-top: 14px;
+  border-radius: 22px;
+  background: linear-gradient(105deg, #fdebf5 0%, #fceaf3 100%);
+  padding: 14px 14px 16px 4px;
+  overflow: hidden;
+}
+
+.insight img {
+  width: 100px;
+  height: auto;
+  align-self: end;
+  margin-left: -6px;
+}
+
+.insight h2 {
+  margin: 2px 0 6px;
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.insight p {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: #4a4356;
+}
+
+.disclaimer {
+  margin-top: 7px !important;
+  font-size: 10.5px !important;
+  color: #857e90 !important;
+}
