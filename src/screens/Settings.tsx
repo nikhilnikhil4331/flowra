@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   User, SlidersHorizontal, BellRing, Bell, ShieldCheck, Languages, LifeBuoy,
-  Star, Info, ChevronRight, ChevronDown, Database, Minus, Plus, Download, Trash2,
+  Star, Info, ChevronRight, ChevronDown, Database, CalendarClock, Minus, Plus, Download, Trash2,
 } from 'lucide-react';
 import { useStore } from '../store';
 import {
@@ -20,6 +20,7 @@ export function More() {
 
   const rows = [
     { label: 'My Data', Icon: Database, onClick: () => go('reports') },
+    { label: 'Period Delay Guide', Icon: CalendarClock, onClick: () => go('delay-guide') },
     { label: 'Reminders', Icon: Bell, onClick: () => go('reminders') },
     { label: 'Notification Settings', Icon: BellRing, onClick: () => go('settings') },
     { label: 'Privacy & Security', Icon: ShieldCheck, onClick: () => go('settings') },

@@ -8,7 +8,7 @@ export type ScreenId =
   | 'home' | 'calendar' | 'insights' | 'more'
   | 'log-period' | 'log-symptoms' | 'body-tracker'
   | 'food-scanner' | 'nutrition-result' | 'daily-nutrition'
-  | 'flow-color' | 'flow-guide'
+  | 'flow-color' | 'flow-guide' | 'delay-guide'
   | 'medicine' | 'add-medicine' | 'reminders' | 'reminder-detail'
   | 'ai' | 'reports' | 'settings';
 

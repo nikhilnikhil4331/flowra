@@ -118,6 +118,16 @@ export function Home() {
               </p>
             </div>
           </div>
+
+          {/* period delay guide link */}
+          <button onClick={() => go('delay-guide')} className="tap w-full mt-2.5 flex items-center gap-3 bg-white rounded-2xl shadow-card border border-blush-line/60 px-3.5 py-3 text-left">
+            <span className="text-[19px]">🌸</span>
+            <span className="flex-1 min-w-0">
+              <span className="block text-[12.5px] font-extrabold leading-tight">Period Delay Guide</span>
+              <span className="block text-[10.5px] font-semibold text-ink-mute">Precautions & what to do first if it's late</span>
+            </span>
+            <ChevronRight size={15} className="text-ink-faint shrink-0" strokeWidth={2.8} />
+          </button>
         </div>
       </ScreenScroll>
 

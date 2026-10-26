@@ -18,8 +18,15 @@ export function aiReply(question: string, cycle: CycleInfo, todayLog?: DayLog, u
     const painNote = todayLog && todayLog.pain > 0 ? ` I see you logged pain at ${todayLog.pain}/10 today — I'm sorry, that sounds tough.` : '';
     return `Cramps are very common during the ${cycle.phaseLabel.toLowerCase()}.${painNote} Here are some gentle suggestions:\n• Use a warm compress on your lower abdomen\n• Stay hydrated\n• Try light movement or stretching\n• Ensure adequate sleep\n• A warm drink like ginger tea can soothe\n\n${MEDICAL_DISCLAIMER}`;
   }
-  if (has('late', 'delay', 'missed', 'delay')) {
-    return `Your next period is expected around ${fmt(cycle.nextPeriod)}${cycle.daysUntilNext > 0 ? ` (in ${cycle.daysUntilNext} days)` : ''}. A delay of a few days is common and can be linked to stress, travel, sleep or exercise changes. Your recent cycles average ${cycle.avgCycle} days. If you're more than a week late and there's any chance of pregnancy, consider taking a test, and check in with a doctor if delays keep happening. 💗`;
+  if (has('late', 'delay', 'missed', 'precaution')) {
+    const lateBy = -cycle.daysUntilNext;
+    const status =
+      lateBy > 0
+        ? `Your period was expected around ${fmt(cycle.nextPeriod)} — it looks about ${lateBy} day(s) late. First of all, don't panic: a delay of a few days is very common (cycles of 21–35 days are normal).`
+        : cycle.daysUntilNext === 0
+          ? `Your period is expected today, so it isn't late just yet — sometimes it arrives by evening or the next morning.`
+          : `Good news — it isn't late yet. Your next period is expected around ${fmt(cycle.nextPeriod)} (in ${cycle.daysUntilNext} days), and your cycles average ${cycle.avgCycle} days.`;
+    return `${status}\n\nFirst precautions:\n• Recheck your expected date on the Calendar\n• Wait & watch 3–5 days, keep logging symptoms daily\n• If there's any chance of pregnancy, take a home test about a week after the missed date, with first-morning urine\n• Sleep 7–9 hours, eat regular balanced meals, keep movement gentle\n• Please avoid period-inducing pills or home remedies without a doctor\n\nI've put a full **Period Delay Guide** in the app for you — find it on the Home screen or in the Flow Guide. If delays repeat often, or you miss 3 cycles in a row, please see a doctor. 💗`;
   }
   if (has('next period', 'when', 'due', 'coming')) {
     return `Based on your history (average ${cycle.avgCycle}-day cycles), your next period should arrive around ${fmt(cycle.nextPeriod)}${cycle.daysUntilNext >= 0 ? ` — that's in ${cycle.daysUntilNext} day${cycle.daysUntilNext === 1 ? '' : 's'}` : ''}. You're currently on Day ${cycle.cycleDay}, in your ${cycle.phaseLabel.toLowerCase()}. I'll keep refining this prediction as you log more. 🌷`;

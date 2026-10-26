@@ -82,6 +82,16 @@ export function FlowGuide() {
   return (
     <div className="relative flex flex-col flex-1 min-h-0">
       <Header title="Flow Guide" />
+      <div className="px-5 pb-2.5 shrink-0">
+        <button onClick={() => go('delay-guide')} className="tap w-full flex items-center gap-3 bg-primary-pale border border-primary-soft rounded-[20px] px-4 py-3 text-left">
+          <span className="text-[19px]">⏳</span>
+          <span className="flex-1 min-w-0">
+            <span className="block text-[12.5px] font-extrabold leading-tight">Period delayed?</span>
+            <span className="block text-[10.5px] font-semibold text-ink-mute">First precautions & care guide</span>
+          </span>
+          <ChevronRight size={15} className="text-primary shrink-0" strokeWidth={2.8} />
+        </button>
+      </div>
       <div className="px-5 pb-2 shrink-0">
         <Segmented
           options={[

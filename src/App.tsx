@@ -8,6 +8,7 @@ import { CalendarScreen } from './screens/CalendarScreen';
 import { LogPeriod, LogSymptoms, BodyTracker } from './screens/Logs';
 import { FoodScanner, NutritionResult, DailyNutrition } from './screens/Nutrition';
 import { FlowColor, FlowGuide } from './screens/FlowGuide';
+import { PeriodDelayGuide } from './screens/DelayGuide';
 import { Medicine, AddMedicine, Reminders, ReminderDetail } from './screens/Care';
 import { AiScreen } from './screens/AiScreen';
 import { Insights, Reports } from './screens/Insights';
@@ -34,6 +35,7 @@ const SCREENS: Record<ScreenId, React.ComponentType> = {
   'daily-nutrition': DailyNutrition,
   'flow-color': FlowColor,
   'flow-guide': FlowGuide,
+  'delay-guide': PeriodDelayGuide,
   medicine: Medicine,
   'add-medicine': AddMedicine,
   reminders: Reminders,
