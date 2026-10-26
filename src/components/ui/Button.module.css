@@ -1,0 +1,88 @@
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 54px;
+  padding: 0 22px;
+  border-radius: var(--r-pill);
+  font-size: 16.5px;
+  font-weight: 800;
+  letter-spacing: -0.15px;
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur) var(--ease-out),
+    background var(--dur) var(--ease-out),
+    opacity var(--dur) var(--ease-out);
+}
+
+.full {
+  width: 100%;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.btn:active {
+  transform: scale(0.985);
+}
+
+.primary {
+  color: #fff;
+  background: linear-gradient(100deg, #f2608f 0%, #ee5183 48%, #f26b93 100%);
+  box-shadow:
+    0 10px 22px rgba(238, 81, 131, 0.28),
+    0 1px 0 rgba(255, 255, 255, 0.28) inset;
+}
+.primary:active {
+  box-shadow: 0 6px 14px rgba(238, 81, 131, 0.24);
+}
+
+.soft {
+  color: var(--pink-700);
+  background: var(--pink-100);
+}
+
+.ghost {
+  color: var(--ink-2);
+  background: #fff;
+  border: 1px solid var(--border);
+}
+
+.link {
+  height: auto;
+  padding: 0;
+  color: var(--pink-600);
+  font-size: 13.5px;
+  font-weight: 700;
+  background: none;
+}
+
+.label {
+  display: inline-block;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  transform: translateY(0.5px);
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  margin-left: 2px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-top-color: #fff;
+  animation: btn-spin 700ms linear infinite;
+}
+
+@keyframes btn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

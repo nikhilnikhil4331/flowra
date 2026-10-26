@@ -1,0 +1,126 @@
+.root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  animation: fade-in 300ms var(--ease-out) both;
+}
+
+.back {
+  position: absolute;
+  left: 18px;
+  top: 62px;
+  z-index: 3;
+}
+
+/* hero: width sets the scale, the aspect comes from the artwork itself */
+.girl {
+  position: absolute;
+  left: 50%;
+  top: 68px;
+  width: 176px;
+  height: auto;
+  transform: translateX(-50%);
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, #000 86%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 86%, transparent 100%);
+}
+
+.form {
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  top: 196px;
+  bottom: 232px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+.form::-webkit-scrollbar { display: none; }
+
+.heading {
+  margin: 0;
+  font-size: 25px;
+  font-weight: 800;
+  letter-spacing: -0.55px;
+  color: #201a30;
+  text-align: center;
+}
+
+.sub {
+  margin: 8px 0 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: #7c748a;
+  text-align: center;
+  letter-spacing: -0.1px;
+}
+
+.fields {
+  margin-top: 26px;
+  display: grid;
+  gap: 14px;
+}
+
+/* button + providers + switch sit as one group above the safe area */
+.bottom {
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  bottom: 46px;
+}
+
+.or {
+  margin: 13px 0 0;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #918a9e;
+  text-align: center;
+}
+
+.social {
+  margin-top: 11px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.socialBtn {
+  display: grid;
+  place-items: center;
+  width: 66px;
+  height: 48px;
+  border-radius: 16px;
+  background: #fff;
+  border: 1px solid #f1e4e7;
+  box-shadow: 0 2px 8px rgba(226, 183, 195, 0.12);
+  color: #1d1a26;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.socialBtn:active {
+  transform: scale(0.96);
+}
+
+.switch {
+  margin: 18px 0 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: #857d93;
+  text-align: center;
+}
+
+.switchLink {
+  font-weight: 800;
+  color: #f0507f;
+  padding: 2px 2px;
+}
+
+.forgot {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #7e5c8f;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}

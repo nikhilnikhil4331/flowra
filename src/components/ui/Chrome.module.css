@@ -1,0 +1,51 @@
+.back {
+  display: grid;
+  place-items: center;
+  width: 31px;
+  height: 31px;
+  border-radius: 50%;
+  color: #3a3348;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid #efe3e6;
+  box-shadow: 0 2px 6px rgba(226, 183, 195, 0.14);
+  transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast);
+}
+.back:active {
+  transform: scale(0.93);
+  background: #fff;
+}
+
+.dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e7dcdd;
+  transition:
+    width var(--dur) var(--ease-out),
+    background var(--dur) var(--ease-out);
+}
+
+.dotOn {
+  background: var(--pink-600);
+  box-shadow: 0 1px 4px rgba(249, 78, 130, 0.4);
+}
+
+.message {
+  margin: 10px 2px 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #d94067;
+  text-align: center;
+}
+
+.messageInfo {
+  color: #6d6678;
+}

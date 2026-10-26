@@ -53,8 +53,8 @@ export default function MoreScreen({ api }: { api: AppApi }) {
           ))}
         </ul>
 
-        <button className={styles.logout} onClick={api.reset}>
-          Reset demo data
+        <button className={styles.logout} onClick={() => api.logOut()}>
+          Log Out
         </button>
       </div>
 

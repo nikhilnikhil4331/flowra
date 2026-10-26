@@ -192,3 +192,98 @@ export function StatusBar({ time = '09:41' }: { time?: string }) {
     </div>
   );
 }
+
+/* ------------------------------------------------------------ auth + onboarding */
+
+export function IconArrowRight({ size = 18, className, strokeWidth = 1.9 }: P) {
+  return (
+    <svg {...base(size)} className={className} stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 12h15M13.5 6.5 19 12l-5.5 5.5" />
+    </svg>
+  );
+}
+
+export function IconEye({ size = 18, className, off = false, strokeWidth = 1.6 }: P & { off?: boolean }) {
+  return (
+    <svg {...base(size)} className={className} stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12Z" />
+      <circle cx="12" cy="12" r="2.9" />
+      {off && <path d="M4 20 20 4" />}
+    </svg>
+  );
+}
+
+export function IconGoogle({ size = 20, className }: P) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} xmlns="http://www.w3.org/2000/svg">
+      <path fill="#4285F4" d="M23.5 12.3c0-.9-.1-1.5-.2-2.2H12v4.2h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.6Z" />
+      <path fill="#34A853" d="M12 24c3.2 0 5.9-1.1 7.9-2.9l-3.9-3a7.2 7.2 0 0 1-10.7-3.8H1.3v3.1A12 12 0 0 0 12 24Z" />
+      <path fill="#FBBC05" d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6H1.3a12 12 0 0 0 0 10.8l4-3.1Z" />
+      <path fill="#EA4335" d="M12 4.75c1.8 0 3.4.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.3 6.6l4 3.1A7.2 7.2 0 0 1 12 4.75Z" />
+    </svg>
+  );
+}
+
+export function IconApple({ size = 20, className }: P) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+      <path d="M16.4 12.6c0-2.2 1.8-3.3 1.9-3.4-1-1.5-2.6-1.7-3.2-1.7-1.4-.1-2.7.8-3.3.8-.7 0-1.7-.8-2.8-.8-1.5 0-2.8.9-3.6 2.2-1.5 2.6-.4 6.5 1.1 8.6.7 1 1.6 2.2 2.7 2.1 1.1 0 1.5-.7 2.8-.7s1.6.7 2.8.7c1.2 0 1.9-1 2.6-2.1.8-1.2 1.1-2.4 1.2-2.4-.1 0-2.2-.9-2.2-3.3ZM14.2 5.9c.6-.7 1-1.7.9-2.7-.9 0-2 .6-2.6 1.3-.6.6-1.1 1.7-.9 2.6 1 .1 2-.5 2.6-1.2Z" />
+    </svg>
+  );
+}
+
+/* onboarding feature glyphs */
+export function IconPulseHeart({ size = 24, className, strokeWidth = 1.7 }: P) {
+  return (
+    <svg {...base(size)} className={className} stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 20.3 4.9 13a4.6 4.6 0 0 1 6.5-6.5l.6.6.6-.6A4.6 4.6 0 0 1 19.1 13l-1.6 1.6" />
+      <path d="M13.2 14.6h2.2l1.3-2.2 1.4 4 1.3-1.8h2.1" />
+    </svg>
+  );
+}
+
+export function IconFoodScan({ size = 24, className, strokeWidth = 1.7 }: P) {
+  return (
+    <svg {...base(size)} className={className} stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3.5 8.5v-2a3 3 0 0 1 3-3h2M15.5 3.5h2a3 3 0 0 1 3 3v2M20.5 15.5v2a3 3 0 0 1-3 3h-2M8.5 20.5h-2a3 3 0 0 1-3-3v-2" />
+      <path d="M4.8 12.4h13.9a7 7 0 0 1-7 5.4 7 7 0 0 1-6.9-5.4Z" />
+    </svg>
+  );
+}
+
+export function IconAlarm({ size = 24, className, strokeWidth = 1.7 }: P) {
+  return (
+    <svg {...base(size)} className={className} stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12.6" r="7.6" />
+      <path d="M12 9v3.8l2.4 1.4M5 5.2 7 3.4M19 5.2 17 3.4M8.4 20.6 6.7 22.4M15.6 20.6l1.7 1.8" />
+    </svg>
+  );
+}
+
+export function IconSparkline({ size = 24, className, strokeWidth = 1.7 }: P) {
+  return (
+    <svg {...base(size)} className={className} stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 3.4c1.6 2.4 3.2 4 5.6 4.6-1.6 2.3-2 4.6-1.4 7.3-2.6-.6-4.8 0-6.7 1.7-.6-2.4-2-4.1-4.4-5.4 2.3-1.1 3.7-2.8 4.4-5l.3-1.3Z" />
+      <path d="M12.6 17v4M8.4 19.4l1.9 1.6" opacity=".55" />
+    </svg>
+  );
+}
+
+export function IconMoon({ size = 22, className, strokeWidth = 1.7 }: P) {
+  return (
+    <svg {...base(size)} className={className} stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 14.6A8.4 8.4 0 0 1 9.4 4a8.6 8.6 0 1 0 10.6 10.6Z" />
+    </svg>
+  );
+}
+
+export function IconPetals({ size = 22, className, strokeWidth = 1.6 }: P) {
+  return (
+    <svg {...base(size)} className={className} stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 11.2c-2.6 0-3.7-1.6-3.7-3.4S9.4 4.4 12 4.4s3.7 1.6 3.7 3.4-1.1 3.4-3.7 3.4Z" />
+      <path d="M11.2 12c0 2.6-1.6 3.7-3.4 3.7S4.4 14.6 4.4 12s1.6-3.7 3.4-3.7S11.2 9.4 11.2 12Z" />
+      <path d="M12.8 12c0-2.6 1.6-3.7 3.4-3.7S19.6 9.4 19.6 12s-1.6 3.7-3.4 3.7S12.8 14.6 12.8 12Z" />
+      <circle cx="12" cy="12.2" r="1.5" />
+    </svg>
+  );
+}

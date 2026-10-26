@@ -1,0 +1,75 @@
+.root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  animation: fade-in 320ms var(--ease-out) both;
+}
+
+/* the big pink blossom above the wordmark */
+.flower {
+  position: absolute;
+  left: 50%;
+  top: 95px;
+  width: 152px;
+  height: auto;
+  transform: translateX(-50%);
+  animation: bloom 900ms var(--ease-out) both;
+}
+
+.brand {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 236px;
+  text-align: center;
+}
+
+.logo {
+  margin: 0;
+  font-family: 'Dancing Script', var(--font);
+  font-size: 66px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.5px;
+  color: #38286b;
+}
+
+.tagline {
+  margin: 20px auto 0;
+  max-width: 262px;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.55;
+  color: #7c6f92;
+  letter-spacing: -0.1px;
+}
+
+.hero {
+  position: absolute;
+  left: 50%;
+  top: 385px;
+  width: 374px;
+  height: auto;
+  max-width: 104%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  animation: rise 700ms var(--ease-out) 120ms both;
+}
+
+.footer {
+  position: absolute;
+  left: 25px;
+  right: 25px;
+  top: 812px;
+  height: 56px;
+}
+
+@keyframes bloom {
+  from { opacity: 0; transform: translateX(-50%) scale(0.86); }
+  to { opacity: 1; transform: translateX(-50%) scale(1); }
+}
+@keyframes rise {
+  from { opacity: 0; transform: translateX(-50%) translateY(14px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }

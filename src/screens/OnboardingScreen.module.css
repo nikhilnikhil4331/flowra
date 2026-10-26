@@ -1,0 +1,140 @@
+.root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  animation: slide-in 380ms var(--ease-out) both;
+}
+
+.back {
+  position: absolute;
+  left: 22px;
+  top: 72px;
+  z-index: 3;
+}
+
+/* -------------------------------------------------------------- hero slide */
+.hero {
+  position: absolute;
+  left: 50%;
+  top: 44px;
+  width: 344px;
+  height: auto;
+  transform: translateX(-50%);
+  animation: rise 520ms var(--ease-out) both;
+}
+
+/* -------------------------------------------------------------- grid slide */
+.grid {
+  position: absolute;
+  left: 30px;
+  right: 30px;
+  top: 40px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 12px;
+}
+
+.feature {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: 168px;
+  padding: 16px 8px 12px;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 6px 18px rgba(226, 183, 195, 0.16);
+  animation: pop 420ms var(--ease-out) both;
+}
+.feature:nth-child(2) { animation-delay: 60ms; }
+.feature:nth-child(3) { animation-delay: 120ms; }
+.feature:nth-child(4) { animation-delay: 180ms; }
+
+.featureIcon {
+  display: grid;
+  place-items: center;
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+}
+
+.pink {
+  color: #ee5f8c;
+  background: #fde7ee;
+}
+.peach {
+  color: #e98a52;
+  background: #fdeedd;
+}
+.lav {
+  color: #8b7bf0;
+  background: #eeeafe;
+}
+
+.featureLabel {
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 1.28;
+  color: #2f2742;
+  text-align: center;
+  letter-spacing: -0.15px;
+}
+
+/* ---------------------------------------------------------------- copy block */
+.copy {
+  position: absolute;
+  left: 30px;
+  right: 30px;
+  top: 358px;
+  text-align: center;
+}
+
+.heading {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.26;
+  letter-spacing: -0.5px;
+  color: #241d33;
+}
+
+.body {
+  margin: 15px 0 0;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.55;
+  color: #85829e;
+  letter-spacing: -0.1px;
+}
+
+.dotsWrap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 790px;
+  display: flex;
+  justify-content: center;
+}
+
+.footer {
+  position: absolute;
+  left: 44px;
+  right: 44px;
+  top: 838px;
+  height: 56px;
+}
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes rise {
+  from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@keyframes pop {
+  from { opacity: 0; transform: scale(0.94); }
+  to { opacity: 1; transform: none; }
+}

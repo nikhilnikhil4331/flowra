@@ -1,6 +1,15 @@
 import { useCallback, useMemo, useState } from 'react';
 import type { AppData, Note, SymptomLog } from './store';
 import { loadData, newId, resetData, saveData } from './store';
+import type { Account } from './store';
+import {
+  hashPassword,
+  nameProblem,
+  newSalt,
+  normaliseEmail,
+  emailProblem,
+  passwordProblem,
+} from './auth';
 import type { ISODate } from './cycle';
 import { buildCycleModel, todayISO } from './cycle';
 
@@ -88,6 +97,78 @@ export function useAppData() {
     setData(loadData());
   }, []);
 
+  /* ---------------------------------------------------------------- auth */
+
+  const finishOnboarding = useCallback(() => {
+    update((d) => ({ ...d, onboardingSeen: true }));
+  }, [update]);
+
+  const signUp = useCallback(
+    async (name: string, email: string, password: string) => {
+      const problem = nameProblem(name) ?? emailProblem(email) ?? passwordProblem(password);
+      if (problem) throw new Error(problem);
+      const normalised = normaliseEmail(email);
+      if (data.account && data.account.email === normalised)
+        throw new Error('An account with that email already exists on this device.');
+      const salt = newSalt();
+      const hash = await hashPassword(password, salt);
+      const account: Account = {
+        name: name.trim(),
+        email: normalised,
+        salt,
+        hash,
+        createdAt: new Date().toISOString(),
+      };
+      update((d) => ({
+        ...d,
+        account,
+        session: { email: normalised, since: new Date().toISOString() },
+        profile: { ...d.profile, name: account.name, email: normalised },
+      }));
+      return account;
+    },
+    [data.account, update],
+  );
+
+  const logIn = useCallback(
+    async (email: string, password: string) => {
+      const problem = emailProblem(email);
+      if (problem) throw new Error(problem);
+      if (!password) throw new Error('Enter your password.');
+      const normalised = normaliseEmail(email);
+      const account = data.account;
+      if (!account || account.email !== normalised)
+        throw new Error('No account found for that email on this device.');
+      const hash = await hashPassword(password, account.salt);
+      if (hash !== account.hash) throw new Error('That password doesn’t match.');
+      update((d) => ({ ...d, session: { email: normalised, since: new Date().toISOString() } }));
+      return account;
+    },
+    [data.account, update],
+  );
+
+  const logOut = useCallback(() => {
+    update((d) => ({ ...d, session: null }));
+  }, [update]);
+
+  const saveProfileDetails = useCallback(
+    (patch: { dateOfBirth?: ISODate | null; heightCm?: number | null; weightKg?: number | null }) => {
+      update((d) => ({ ...d, profile: { ...d.profile, ...patch } }));
+    },
+    [update],
+  );
+
+  const saveGoals = useCallback(
+    (goals: string[]) => {
+      update((d) => ({
+        ...d,
+        profile: { ...d.profile, goals },
+        onboardingSeen: true,
+      }));
+    },
+    [update],
+  );
+
   return {
     data,
     update,
@@ -98,6 +179,12 @@ export function useAppData() {
     deleteNote,
     logPeriod,
     reset,
+    finishOnboarding,
+    signUp,
+    logIn,
+    logOut,
+    saveProfileDetails,
+    saveGoals,
   };
 }
 

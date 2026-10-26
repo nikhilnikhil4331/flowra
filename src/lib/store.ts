@@ -60,8 +60,24 @@ export type Reminder = {
   kind: 'period' | 'checkin' | 'medicine' | 'water' | 'nutrition' | 'sleep';
 };
 
+export type Account = {
+  name: string;
+  email: string;
+  salt: string;
+  hash: string;
+  createdAt: string;
+};
+
+export type Session = { email: string; since: string };
+
 export type AppData = {
   version: 1;
+  /** device-local account (null until the user signs up) */
+  account: Account | null;
+  /** active session for the account above */
+  session: Session | null;
+  /** splash + onboarding are only shown once */
+  onboardingSeen: boolean;
   profile: Profile;
   /** logged period start dates, newest last */
   periodStarts: ISODate[];
@@ -89,9 +105,12 @@ function seed(): AppData {
 
   return {
     version: 1,
+    account: null,
+    session: null,
+    onboardingSeen: false,
     profile: {
-      name: 'Gargi',
-      email: 'gargi@email.com',
+      name: 'There',
+      email: '',
       dateOfBirth: '2000-04-06',
       heightCm: 160,
       weightKg: 50,
@@ -134,7 +153,15 @@ export function loadData(): AppData {
     if (!raw) return seed();
     const parsed = JSON.parse(raw) as AppData;
     if (parsed.version !== 1) return seed();
-    return { ...seed(), ...parsed, profile: { ...seed().profile, ...parsed.profile } };
+    const base = seed();
+    return {
+      ...base,
+      ...parsed,
+      account: parsed.account ?? null,
+      session: parsed.session ?? null,
+      onboardingSeen: Boolean(parsed.onboardingSeen),
+      profile: { ...base.profile, ...parsed.profile },
+    };
   } catch {
     return seed();
   }

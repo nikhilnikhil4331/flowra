@@ -1,0 +1,93 @@
+.field {
+  display: block;
+}
+
+.labelRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 7px;
+  padding: 0 2px;
+}
+
+.label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #6d6678;
+  letter-spacing: -0.05px;
+}
+
+.hint {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #8f7f9e;
+}
+
+.box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 47px;
+  border-radius: 16px;
+  background: #fff;
+  border: 1px solid #f3e6e8;
+  box-shadow: 0 1px 2px rgba(226, 183, 195, 0.08);
+  transition:
+    border-color var(--dur) var(--ease-out),
+    box-shadow var(--dur) var(--ease-out);
+}
+
+.box:focus-within {
+  border-color: var(--pink-300);
+  box-shadow: 0 0 0 3px rgba(254, 98, 145, 0.12);
+}
+
+.boxError {
+  border-color: #f3a0b4;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 15px;
+  border: 0;
+  border-radius: 16px;
+  background: none;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: -0.1px;
+}
+
+.input::placeholder {
+  color: #b9b2c4;
+  font-weight: 500;
+}
+
+.input:focus {
+  outline: none;
+}
+
+.eye {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 100%;
+  color: #8d8698;
+  border-left: 1px solid #f6ebec;
+}
+
+.trailing {
+  display: grid;
+  place-items: center;
+  padding-right: 12px;
+  color: #57506a;
+}
+
+.error {
+  margin: 6px 2px 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #d94067;
+}
