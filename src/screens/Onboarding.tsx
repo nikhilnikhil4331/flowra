@@ -48,7 +48,7 @@ export function Splash() {
 
       <div className="flex-1 relative">
         <Mascot
-          src="/images/woman-hero.png"
+          src="/images/mascot-hero.png"
           alt="Myflo mascot among pink peonies"
           className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[118%] max-w-none animate-floaty"
         />
@@ -69,7 +69,7 @@ export function Onboard1() {
     <div className="relative flex flex-col flex-1 overflow-hidden">
       <SkipCorner page={0} />
       <div className="px-8 pt-2 flex-1 flex flex-col">
-        <Mascot src="/images/woman-hello.png" alt="Myflo mascot waving" className="w-[220px] mx-auto animate-floaty" />
+        <Mascot src="/images/mascot-hello.png" alt="Myflo mascot waving" className="w-[220px] mx-auto animate-floaty" />
         <h2 className="text-center text-[21px] font-black mt-4 animate-fade-up">Understand Your Cycle</h2>
         <p className="text-center text-[13px] font-semibold text-ink-mute mt-2 leading-relaxed animate-fade-up">
           Track periods, symptoms, mood<br />and more – all in one place.
@@ -119,7 +119,7 @@ export function Onboard3() {
     <div className="relative flex flex-col flex-1 overflow-hidden">
       <SkipCorner page={2} />
       <div className="px-8 pt-2 flex-1 flex flex-col">
-        <Mascot src="/images/woman-heart.png" alt="Myflo mascot hugging a heart" className="w-[230px] mx-auto animate-floaty" />
+        <Mascot src="/images/mascot-heart.png" alt="Myflo mascot hugging a heart" className="w-[230px] mx-auto animate-floaty" />
         <h2 className="text-center text-[21px] font-black mt-4 leading-snug animate-fade-up">
           Your Personal Health<br />Companion
         </h2>

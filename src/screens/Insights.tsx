@@ -3,7 +3,7 @@ import { format, subMonths, startOfMonth } from 'date-fns';
 import { ChevronRight } from 'lucide-react';
 import { useStore } from '../store';
 import { computeCycle, fromKey, toKey, add, today } from '../lib/cycle';
-import { SYMPTOMS, MOODS } from '../data/content';
+import { SYMPTOMS, MOOD_ALL } from '../data/content';
 import { BarChart, LineChart, HBar } from '../components/charts';
 import {
   Header, ScreenScroll, BottomNav, UnderlineTabs, Card, SectionTitle,
@@ -12,7 +12,7 @@ import {
 
 /* ------------------------------ data helpers -------------------------------- */
 
-function useAnalytics() {
+export function useAnalytics() {
   const periods = useStore((s) => s.periods);
   const dayLogs = useStore((s) => s.dayLogs);
   const meals = useStore((s) => s.meals);
@@ -60,7 +60,7 @@ function useAnalytics() {
     const moodCounts = new Map<string, number>();
     entries.forEach((l) => { if (l.mood) moodCounts.set(l.mood, (moodCounts.get(l.mood) ?? 0) + 1); });
     const moodTotal = Math.max(1, [...moodCounts.values()].reduce((a, b) => a + b, 0));
-    const moodFreq = MOODS
+    const moodFreq = MOOD_ALL
       .map((m) => ({ label: `${m.emoji} ${m.label}`, pct: Math.round(((moodCounts.get(m.id) ?? 0) / moodTotal) * 100) }))
       .filter((m) => m.pct > 0)
       .sort((a, b) => b.pct - a.pct);
@@ -131,8 +131,11 @@ export function Insights() {
                 </span>
               </button>
 
-              <button onClick={() => go('reports')} className="tap w-full flex items-center justify-center gap-1 text-[12.5px] font-extrabold text-primary pb-2">
-                View detailed reports <ChevronRight size={15} strokeWidth={3} />
+              <button onClick={() => go('cycle-history')} className="tap w-full flex items-center justify-center gap-1 text-[12.5px] font-extrabold text-primary">
+                View cycle history <ChevronRight size={15} strokeWidth={3} />
+              </button>
+              <button onClick={() => go('reports')} className="tap w-full flex items-center justify-center gap-1 text-[12px] font-extrabold text-ink-mute pb-2">
+                View detailed reports <ChevronRight size={14} strokeWidth={3} />
               </button>
             </>
           )}

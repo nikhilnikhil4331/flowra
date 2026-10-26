@@ -29,97 +29,119 @@ function ArcSeg({
   );
 }
 
-export function CycleWheel({ cycle, size = 300 }: { cycle: CycleInfo; size?: number }) {
+export function CycleWheel({ cycle, size = 312 }: { cycle: CycleInfo; size?: number }) {
   const total = Math.max(cycle.avgCycle, cycle.cycleDay, 21);
-  const R = size / 2 - 34;
   const c = size / 2;
-  const angleFor = (day: number) => ((day - cycle.cycleDay) / total) * 360;
-  const daySpan = 360 / total;
+  const R_OUT = size / 2 - 8;   // thin outer ring with tick dots
+  const R_NUM = size / 2 - 31;  // day numbers (01, 04, 07 …)
+  const R_ARC = size / 2 - 47;  // thick "Menstrual" arc
+  const R_IN = size / 2 - 79;   // inner thin circle
+  const ARC_W = 27;
 
-  // period arc (days 1..avgPeriodLen), fertile arc, ovulation marker
-  const ovDay = Math.round(total - 14);
-  const fertileFrom = ovDay - 5;
+  // Day 1 sits at the top; days advance clockwise — exactly like the reference dial.
+  const dayAngle = (day: number) => ((day - 1) / total) * 360;
+  const periodSpan = Math.max(10, (cycle.avgPeriodLen / total) * 360);
+  const arcStart = -4;
 
-  const labels: { day: number; pos: { x: number; y: number }; current: boolean }[] = [];
-  for (let off = -Math.floor(total / 2); off <= Math.floor(total / 2); off++) {
-    const day = (((cycle.cycleDay - 1 + off) % total) + total) % total + 1;
-    if (Math.abs(off) <= 2 || off % 7 === 0) {
-      labels.push({ day, pos: polar(c, c, R + 20, off * daySpan), current: off === 0 });
-    }
-  }
+  const labels: number[] = [];
+  for (let d = 1; d <= total; d += 3) labels.push(d);
 
-  const dots = Array.from({ length: total }, (_, i) => i + 1).map((day) => {
-    const p = polar(c, c, R, angleFor(day));
-    const isPeriod = day <= cycle.avgPeriodLen;
-    const isOv = day === ovDay;
-    return { day, p, isPeriod, isOv };
-  });
+  const a0 = polar(c, c, R_ARC, arcStart);
+  const a1 = polar(c, c, R_ARC, arcStart + periodSpan);
+  const arcPath = `M ${a0.x} ${a0.y} A ${R_ARC} ${R_ARC} 0 ${periodSpan > 180 ? 1 : 0} 1 ${a1.x} ${a1.y}`;
 
-  const curPos = polar(c, c, R, 0);
+  const markerDays = Array.from(new Set([Math.min(4, cycle.avgPeriodLen), cycle.avgPeriodLen])).filter(
+    (d, i, arr) => i === 0 || dayAngle(d) - dayAngle(arr[0]) > 16,
+  );
+
+  const todayAngle = dayAngle(Math.min(cycle.cycleDay, total));
+  const todayInArc = todayAngle >= arcStart && todayAngle <= arcStart + periodSpan;
+
+  const Drop = ({ x, y, s = 1 }: { x: number; y: number; s?: number }) => (
+    <g transform={`translate(${x - 5.5 * s} ${y - 6.6 * s}) scale(${s})`}>
+      <path d="M5.5 0C5.5 0 0 6.4 0 8.9a5.5 5.5 0 0 0 11 0C11 6.4 5.5 0 5.5 0Z" fill="#EE4D7B" />
+    </g>
+  );
 
   return (
     <div className="relative mx-auto" style={{ width: size, height: size }} role="img" aria-label={`Cycle wheel. Day ${cycle.cycleDay}, ${cycle.phaseLabel}`}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
         <defs>
-          <linearGradient id="wheelPink" x1="0" y1="0" x2="1" y2="1">
+          <linearGradient id="wheelPink" x1="0" y1="0" x2="0.9" y2="1">
             <stop offset="0%" stopColor="#F78FB0" />
+            <stop offset="55%" stopColor="#F25B8A" />
             <stop offset="100%" stopColor="#EE4D7B" />
           </linearGradient>
+          <path id="menstrualArcPath" d={arcPath} fill="none" />
         </defs>
-        {/* track */}
-        <circle cx={c} cy={c} r={R} stroke="#FBE3EB" strokeWidth={15} fill="none" />
-        <circle cx={c} cy={c} r={R - 16} stroke="#FDFAF7" strokeWidth={1.5} fill="#FFFBF9" />
-        {/* fertile arc */}
-        <ArcSeg size={size} r={R} fromDeg={angleFor(fertileFrom) - daySpan / 2} spanDeg={daySpan * 7} color="#C9B8F7" width={15} opacity={0.85} />
-        {/* period arc */}
-        <ArcSeg size={size} r={R} fromDeg={angleFor(1) - daySpan / 2} spanDeg={daySpan * cycle.avgPeriodLen} color="url(#wheelPink)" width={15} />
-        {/* traveled arc up to today */}
-        <ArcSeg size={size} r={R} fromDeg={angleFor(1)} spanDeg={(cycle.cycleDay - 1) * daySpan} color="#F25B8A" width={15} opacity={0.25} />
-        {/* day dots */}
-        {dots.map(({ day, p, isPeriod, isOv }) => (
-          <circle
-            key={day}
-            cx={p.x}
-            cy={p.y}
-            r={isOv ? 3.4 : 1.8}
-            fill={isOv ? '#FFB657' : isPeriod ? '#FFFFFF' : '#EFBBCC'}
-            opacity={isPeriod ? 0.95 : 1}
-          />
-        ))}
-        {/* tiny droplets on predicted period days */}
-        {dots
-          .filter((d) => d.isPeriod && d.day !== cycle.cycleDay)
-          .map(({ day, p }) => (
-            <g key={`drop-${day}`} transform={`translate(${p.x - 4.5} ${p.y - 5.5})`}>
-              <path d="M4.5 0C4.5 0 0 5.2 0 7.4a4.5 4.5 0 0 0 9 0C9 5.2 4.5 0 4.5 0Z" fill="#EE4D7B" />
-            </g>
-          ))}
-        {/* day number labels */}
-        {labels.map(({ day, pos, current }, i) => (
-          <text
-            key={`${day}-${i}`}
-            x={pos.x}
-            y={pos.y + 3}
-            textAnchor="middle"
-            fontSize={current ? 11 : 9}
-            fontWeight={800}
-            fill={current ? '#EE4D7B' : '#C79CA9'}
-            fontFamily="Nunito, sans-serif"
-          >
-            {String(day).padStart(2, '0')}
-          </text>
-        ))}
-      </svg>
 
-      {/* current day droplet marker */}
-      <div
-        className="absolute z-10 w-[30px] h-[30px] rounded-full bg-white shadow-btn border-2 border-primary flex items-center justify-center"
-        style={{ left: curPos.x - 15, top: curPos.y - 15 }}
-      >
-        <svg width="13" height="16" viewBox="0 0 24 28" aria-hidden>
-          <path d="M12 1.5C12 1.5 3.5 12 3.5 17.5a8.5 8.5 0 0 0 17 0C20.5 12 12 1.5 12 1.5Z" fill="#EE4D7B" />
-        </svg>
-      </div>
+        {/* thin outer ring */}
+        <circle cx={c} cy={c} r={R_OUT} stroke="#F0A9C0" strokeWidth={1.4} fill="none" />
+        {/* tick dots for every day */}
+        {Array.from({ length: total }, (_, i) => {
+          const p = polar(c, c, R_OUT, dayAngle(i + 1));
+          return <circle key={i} cx={p.x} cy={p.y} r={1.7} fill="#E58AA6" />;
+        })}
+
+        {/* day numbers every 3 days */}
+        {labels.map((day) => {
+          const p = polar(c, c, R_NUM, dayAngle(day));
+          const current = day === cycle.cycleDay;
+          return (
+            <text
+              key={day}
+              x={p.x}
+              y={p.y + 4}
+              textAnchor="middle"
+              fontSize={12}
+              fontWeight={current ? 900 : 700}
+              fill={current ? '#EE4D7B' : '#8A6D76'}
+              fontFamily="Nunito, sans-serif"
+            >
+              {String(day).padStart(2, '0')}
+            </text>
+          );
+        })}
+
+        {/* thick menstrual arc */}
+        <path d={arcPath} stroke="url(#wheelPink)" strokeWidth={ARC_W} strokeLinecap="round" fill="none" />
+        {periodSpan > 24 && (
+          <text fontSize={10.5} fontWeight={800} fill="#FFFFFF" fontFamily="Nunito, sans-serif" letterSpacing={2.5}>
+            <textPath href="#menstrualArcPath" startOffset="52%" textAnchor="middle">
+              Menstrual
+            </textPath>
+          </text>
+        )}
+
+        {/* droplet badges on the arc */}
+        {markerDays.map((d) => {
+          const p = polar(c, c, R_ARC, dayAngle(d));
+          return (
+            <g key={d}>
+              <circle cx={p.x} cy={p.y} r={11.5} fill="#FFFFFF" />
+              <Drop x={p.x} y={p.y} />
+            </g>
+          );
+        })}
+
+        {/* today marker when outside the menstrual arc */}
+        {!todayInArc && (
+          <g>
+            {(() => {
+              const p = polar(c, c, R_OUT, todayAngle);
+              return (
+                <>
+                  <circle cx={p.x} cy={p.y} r={9.5} fill="#FFFFFF" stroke="#EE4D7B" strokeWidth={2} />
+                  <Drop x={p.x} y={p.y} s={0.8} />
+                </>
+              );
+            })()}
+          </g>
+        )}
+
+        {/* inner thin circle */}
+        <circle cx={c} cy={c} r={R_IN} stroke="#F0A9C0" strokeWidth={1.4} fill="#FFFBF9" />
+      </svg>
     </div>
   );
 }

@@ -35,7 +35,7 @@ export function More() {
         <div className="px-5 pt-1">
           <button onClick={() => go('settings')} className="tap w-full flex items-center gap-3 bg-white rounded-[22px] shadow-card border border-blush-line/60 px-4 py-3.5 text-left animate-fade-up">
             <span className="w-[52px] h-[52px] rounded-full overflow-hidden bg-primary-soft shrink-0">
-              <Mascot src="/images/woman-avatar.png" blend={false} className="w-full h-full object-cover" alt="" />
+              <Mascot src="/images/mascot-avatar.png" blend={false} className="w-full h-full object-cover" alt="" />
             </span>
             <span className="flex-1 min-w-0">
               <span className="block text-[15px] font-black truncate">{user.name || 'Gargi'}</span>

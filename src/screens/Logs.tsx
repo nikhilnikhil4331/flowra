@@ -53,7 +53,7 @@ export function LogPeriod() {
       <Header title="Log Period" right={<CheckButton onClick={save} />} />
       <div className="relative px-5 -mt-1 flex items-end justify-between">
         <p className="text-[12px] font-semibold text-ink-mute pb-1">When did your period start & end?</p>
-        <Mascot src="/images/woman-heart.png" className="h-[64px] w-auto" alt="" />
+        <Mascot src="/images/mascot-heart.png" className="h-[64px] w-auto" alt="" />
       </div>
 
       <ScreenScroll>
@@ -185,17 +185,20 @@ export function LogSymptoms() {
       <ScreenScroll withNav>
         <div className="px-5 space-y-5 pt-1">
           <section>
-            <p className="text-[12px] font-bold text-ink-soft mb-2">How are you feeling today?</p>
-            <p className="text-[11px] font-extrabold text-ink-mute mb-2">Mood</p>
-            <div className="flex justify-between">
+            <p className="text-[13px] font-extrabold text-ink mb-2">How are you feeling today?</p>
+            <p className="text-[12px] font-extrabold text-ink-soft mb-2">Mood</p>
+            <div className="grid grid-cols-4 gap-2">
               {MOODS.map((m) => {
                 const on = value.mood === m.id;
                 return (
-                  <button key={m.id} onClick={() => patch({ mood: on ? undefined : m.id })} aria-pressed={on} className="tap flex flex-col items-center gap-1">
-                    <span className={`w-[44px] h-[44px] rounded-full flex items-center justify-center text-[22px] border-2 transition-all ${on ? 'bg-primary-pale border-primary scale-110 shadow-soft' : 'bg-white border-blush-line'}`}>
-                      {m.emoji}
-                    </span>
-                    <span className={`text-[9px] font-extrabold ${on ? 'text-primary' : 'text-ink-mute'}`}>{m.label}</span>
+                  <button
+                    key={m.id}
+                    onClick={() => patch({ mood: on ? undefined : m.id })}
+                    aria-pressed={on}
+                    className={`tap rounded-[18px] py-2.5 px-1 flex flex-col items-center gap-1 border-[1.5px] transition-colors ${on ? 'bg-primary-pale border-primary shadow-soft' : 'bg-[#FFF6EF] border-transparent'}`}
+                  >
+                    <span className="text-[24px] leading-none">{m.emoji}</span>
+                    <span className={`text-[10px] font-extrabold ${on ? 'text-primary' : 'text-ink-soft'}`}>{m.label}</span>
                   </button>
                 );
               })}
@@ -204,20 +207,18 @@ export function LogSymptoms() {
 
           <section>
             <SectionTitle className="mb-2.5">Physical Symptoms</SectionTitle>
-            <div className="grid grid-cols-4 gap-y-3.5">
-              {SYMPTOMS.map((s) => {
+            <div className="grid grid-cols-4 gap-2">
+              {SYMPTOMS.filter((s) => ['cramps', 'headache', 'bloating', 'acne', 'nausea', 'back-pain', 'fatigue', 'cravings'].includes(s.id)).map((s) => {
                 const on = value.symptoms.includes(s.id);
                 return (
-                  <button key={s.id} onClick={() => toggleSym(s.id)} aria-pressed={on} className="tap flex flex-col items-center gap-1">
-                    <span className={`relative w-[46px] h-[46px] rounded-full flex items-center justify-center text-[21px] border-2 transition-all ${on ? 'bg-primary-pale border-primary shadow-soft' : 'bg-white border-blush-line'}`}>
-                      {s.emoji}
-                      {on && (
-                        <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-grad-pink text-white flex items-center justify-center">
-                          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round"><path d="M20 6 9 17l-5-5" /></svg>
-                        </span>
-                      )}
-                    </span>
-                    <span className={`text-[9px] font-extrabold text-center leading-tight max-w-[64px] ${on ? 'text-primary' : 'text-ink-mute'}`}>{s.label}</span>
+                  <button
+                    key={s.id}
+                    onClick={() => toggleSym(s.id)}
+                    aria-pressed={on}
+                    className={`tap rounded-[18px] py-2.5 px-1 flex flex-col items-center gap-1 border-[1.5px] transition-colors ${on ? 'bg-primary-pale border-primary shadow-soft' : 'bg-[#FFF6EF] border-transparent'}`}
+                  >
+                    <span className="text-[23px] leading-none">{s.emoji}</span>
+                    <span className={`text-[9.5px] font-extrabold text-center leading-tight ${on ? 'text-primary' : 'text-ink-soft'}`}>{s.label}</span>
                   </button>
                 );
               })}
@@ -229,12 +230,60 @@ export function LogSymptoms() {
               <SectionTitle>
                 Pain Level <span className="text-ink-mute font-bold text-[11.5px]">(Lower Abdomen)</span>
               </SectionTitle>
-              <span className="text-[12px] font-black text-primary">{value.pain}/10</span>
+              <span className="text-[12.5px] font-black text-ink">{value.pain}/10</span>
             </div>
             <Slider value={value.pain} onChange={(v) => patch({ pain: v })} />
-            <div className="flex justify-between text-[9px] font-bold text-ink-faint mt-1 px-0.5">
-              <span>None</span><span>Mild</span><span>Severe</span>
+            <ScaleMarks />
+          </section>
+
+          <section>
+            <SectionTitle className="mb-2.5">Bleeding Amount</SectionTitle>
+            <div className="grid grid-cols-4 gap-2">
+              {BLEEDING.map((b) => {
+                const on = value.bleeding === b;
+                const style = BLEED_STYLE[b];
+                return (
+                  <button
+                    key={b}
+                    onClick={() => patch({ bleeding: on ? undefined : b })}
+                    aria-pressed={on}
+                    className={`tap rounded-[18px] py-2.5 px-1 flex flex-col items-center gap-1.5 border-[1.5px] transition-colors ${on ? 'bg-primary-pale border-primary shadow-soft' : 'bg-[#FFF6EF] border-transparent'}`}
+                  >
+                    <span className="h-[22px] flex items-end">
+                      <DropletIcon size={style.s} color={style.c} />
+                    </span>
+                    <span className={`text-[10px] font-extrabold ${on ? 'text-primary' : 'text-ink-soft'}`}>{b}</span>
+                  </button>
+                );
+              })}
             </div>
+          </section>
+
+          <section>
+            <div className="flex items-center justify-between mb-2">
+              <SectionTitle>Bloating Level</SectionTitle>
+              <span className="text-[12.5px] font-black text-ink">{value.bloating}/10</span>
+            </div>
+            <Slider value={value.bloating} onChange={(v) => patch({ bloating: v })} />
+            <ScaleMarks />
+          </section>
+
+          <section>
+            <div className="flex items-center justify-between mb-2">
+              <SectionTitle>Stress Level</SectionTitle>
+              <span className="text-[12.5px] font-black text-ink">{value.stress}/10</span>
+            </div>
+            <Slider value={value.stress} onChange={(v) => patch({ stress: v })} />
+            <ScaleMarks />
+          </section>
+
+          <section>
+            <div className="flex items-center justify-between mb-2">
+              <SectionTitle>Energy Level</SectionTitle>
+              <span className="text-[12.5px] font-black text-ink">{value.energy}/10</span>
+            </div>
+            <Slider value={value.energy} onChange={(v) => patch({ energy: v })} />
+            <ScaleMarks />
           </section>
 
           <section>
@@ -259,6 +308,23 @@ export function LogSymptoms() {
 
 const BLEEDING = ['Spotting', 'Light', 'Moderate', 'Heavy'] as const;
 
+const BLEED_STYLE: Record<(typeof BLEEDING)[number], { c: string; s: number }> = {
+  Spotting: { c: '#F7A8C4', s: 13 },
+  Light: { c: '#F472A0', s: 15 },
+  Moderate: { c: '#EE4D7B', s: 17 },
+  Heavy: { c: '#C21847', s: 19 },
+};
+
+function ScaleMarks() {
+  return (
+    <div className="flex justify-between text-[9px] font-bold text-ink-faint mt-1 px-0.5" aria-hidden>
+      {[0, 2, 4, 6, 8, 10].map((n) => (
+        <span key={n}>{n}</span>
+      ))}
+    </div>
+  );
+}
+
 function TrackerRow({
   label, value, onChange,
 }: { label: string; value: number; onChange: (v: number) => void }) {
@@ -270,6 +336,7 @@ function TrackerRow({
         <span className="text-[12px] font-black text-ink-soft">{value}<span className="text-ink-faint">/10</span></span>
       </div>
       <Slider value={value} onChange={onChange} />
+      <ScaleMarks />
     </div>
   );
 }

@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight, Droplets, Heart, Egg, BookOpen, CalendarChec
 import { useStore } from '../store';
 import { computeCycle, today, toKey, fromKey, add } from '../lib/cycle';
 import { BottomNav, ScreenScroll, Card, SectionTitle } from '../components/ui';
-import { MOODS } from '../data/content';
+import { MOOD_ALL } from '../data/content';
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -33,7 +33,7 @@ export function CalendarScreen() {
 
   const selKey = toKey(selected);
   const selLog = dayLogs[selKey];
-  const selMood = MOODS.find((m) => m.id === selLog?.mood);
+  const selMood = MOOD_ALL.find((m) => m.id === selLog?.mood);
 
   const badges: string[] = [];
   if (cycle.isPeriodDay(selected)) badges.push('🩸 Period day');
@@ -61,83 +61,93 @@ export function CalendarScreen() {
 
       <ScreenScroll withNav>
         <div className="px-5">
-          {/* month nav */}
-          <div className="flex items-center justify-center gap-4 mt-1">
-            <button onClick={() => setCursor(subMonths(cursor, 1))} aria-label="Previous month" className="tap text-ink-soft">
-              <ChevronLeft size={18} strokeWidth={3} />
-            </button>
-            <h2 className="text-[14.5px] font-black min-w-[120px] text-center">{format(cursor, 'MMMM, yyyy')}</h2>
-            <button onClick={() => setCursor(addMonths(cursor, 1))} aria-label="Next month" className="tap text-ink-soft">
-              <ChevronRight size={18} strokeWidth={3} />
-            </button>
-          </div>
-
-          {/* weekday header */}
-          <div className="grid grid-cols-7 mt-3 mb-1">
-            {WEEKDAYS.map((d, i) => (
-              <div key={d} className={`text-center text-[10px] font-extrabold ${i === 0 || i === 6 ? 'text-primary-light' : 'text-ink-mute'}`}>{d}</div>
-            ))}
-          </div>
-
-          {/* cells */}
-          <div className="grid grid-cols-7">
-            {days.map((d, i) => {
-              if (!d) return <div key={`b-${i}`} />;
-              const key = toKey(d);
-              const isSel = key === selKey;
-              const isToday = key === toKey(now);
-              const isPer = cycle.isPeriodDay(d);
-              const isPred = cycle.isPredictedPeriod(d);
-              const isOv = cycle.isOvulation(d);
-              const isFert = cycle.isFertile(d);
-              const logged = !!dayLogs[key];
-              const dot = isPer || isPred ? '#EE4D7B' : isOv ? '#FFB657' : isFert ? '#9DB8EC' : logged ? '#F78FB0' : null;
-              return (
-                <button
-                  key={key}
-                  onClick={() => setSelected(d)}
-                  aria-label={`${format(d, 'EEEE d MMMM')}${isPer ? ', period day' : ''}`}
-                  aria-pressed={isSel}
-                  className="tap relative flex flex-col items-center justify-center h-[46px]"
-                >
-                  <span
-                    className={`w-[34px] h-[34px] rounded-full flex items-center justify-center text-[12.5px] font-extrabold transition-all ${
-                      isSel
-                        ? 'bg-grad-pink text-white shadow-btn'
-                        : isPer
-                          ? 'bg-primary text-white'
-                          : isPred
-                            ? 'bg-primary-soft text-primary border border-dashed border-primary-light'
-                            : isToday
-                              ? 'border-2 border-primary text-primary'
-                              : isFert
-                                ? 'bg-[#EDF2FD] text-ink-soft'
-                                : 'text-ink-soft'
-                    }`}
-                  >
-                    {d.getDate()}
-                  </span>
-                  {dot && !isSel && <span className="absolute bottom-[3px] w-[5px] h-[5px] rounded-full" style={{ background: dot }} />}
+          {/* month card — peach band like reference */}
+          <div className="bg-white rounded-[22px] shadow-card border border-blush-line/60 overflow-hidden mt-1">
+            <div className="bg-[#FDEAD7] px-3 pt-3 pb-2">
+              <div className="flex items-center justify-between px-1">
+                <button onClick={() => setCursor(subMonths(cursor, 1))} aria-label="Previous month" className="tap text-ink">
+                  <ChevronLeft size={18} strokeWidth={3} />
                 </button>
-              );
-            })}
+                <h2 className="text-[14.5px] font-black text-center">{format(cursor, 'MMMM, yyyy')}</h2>
+                <button onClick={() => setCursor(addMonths(cursor, 1))} aria-label="Next month" className="tap text-ink">
+                  <ChevronRight size={18} strokeWidth={3} />
+                </button>
+              </div>
+              <div className="grid grid-cols-7 mt-2.5">
+                {WEEKDAYS.map((d) => (
+                  <div key={d} className="text-center text-[10px] font-extrabold text-ink-soft">{d}</div>
+                ))}
+              </div>
+            </div>
+
+            {/* cells */}
+            <div className="grid grid-cols-7 px-1.5 py-1.5">
+              {days.map((d, i) => {
+                if (!d) return <div key={`b-${i}`} />;
+                const key = toKey(d);
+                const isSel = key === selKey;
+                const isToday = key === toKey(now);
+                const isPer = cycle.isPeriodDay(d);
+                const isPred = cycle.isPredictedPeriod(d);
+                const isOv = cycle.isOvulation(d);
+                const isFert = cycle.isFertile(d);
+                const logged = !!dayLogs[key];
+                const showBand = isFert && !isPer && !isPred;
+                const prevFert = cycle.isFertile(add(d, -1));
+                const nextFert = cycle.isFertile(add(d, 1));
+                const dot = isPer || isPred ? null : isOv ? '#A78BFA' : isFert ? '#8FA8EC' : logged ? '#F78FB0' : null;
+                return (
+                  <button
+                    key={key}
+                    onClick={() => setSelected(d)}
+                    aria-label={`${format(d, 'EEEE d MMMM')}${isPer ? ', period day' : ''}`}
+                    aria-pressed={isSel}
+                    className="tap relative flex flex-col items-center justify-center h-[44px]"
+                  >
+                    {showBand && (
+                      <span
+                        className={`absolute top-1/2 -translate-y-1/2 h-[32px] inset-x-0 bg-[#E4EBFC] ${prevFert ? '' : 'rounded-l-full'} ${nextFert ? '' : 'rounded-r-full'}`}
+                        aria-hidden
+                      />
+                    )}
+                    <span
+                      className={`relative w-[33px] h-[33px] rounded-full flex items-center justify-center text-[12px] font-extrabold transition-all ${
+                        isSel
+                          ? 'bg-grad-pink text-white shadow-[0_0_0_2px_#fff,0_0_0_4px_#EE4D7B]'
+                          : isPer
+                            ? 'bg-primary text-white'
+                            : isPred
+                              ? 'bg-primary-soft text-primary border border-dashed border-primary-light'
+                              : isToday
+                                ? 'border-2 border-primary text-primary bg-white'
+                                : 'text-ink-soft'
+                      }`}
+                    >
+                      {String(d.getDate()).padStart(2, '0')}
+                    </span>
+                    {dot && !isSel && <span className="absolute bottom-[2px] w-[5px] h-[5px] rounded-full" style={{ background: dot }} />}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* legend */}
           <div className="flex flex-wrap gap-x-4 gap-y-1.5 justify-center mt-3 text-[10px] font-bold text-ink-soft">
-            <Legend color="#F25B8A" label="Period" solid />
-            <Legend color="#FDE9F0" label="Predicted" ring />
-            <Legend color="#9DB8EC" label="Fertile Window" dot />
-            <Legend color="#FFB657" label="Ovulation" dot />
+            <Legend color="#EE4D7B" label="Period" solid />
+            <Legend color="#93A8E8" label="Fertile Window" solid />
+            <Legend color="#A78BFA" label="Ovulation" dot />
+            <Legend color="#F8BBD0" label="Predicted" dot />
+            <Legend color="#EE4D7B" label="Today" ring />
           </div>
 
           {/* cycle events */}
           <SectionTitle className="mt-5 mb-2.5">Cycle Events</SectionTitle>
-          <div className="flex justify-between px-1">
-            <EventBtn icon={<Droplets size={19} />} label="Period" tint="#F25B8A" onClick={() => go('log-period', { date: selKey })} />
-            <EventBtn icon={<Heart size={19} />} label="Symptoms" tint="#F78FB0" onClick={() => go('log-symptoms', { date: selKey })} />
-            <EventBtn icon={<Egg size={19} />} label="Ovulation" tint="#FFB657" onClick={() => go('insights')} />
-            <EventBtn icon={<BookOpen size={19} />} label="Flow Guide" tint="#B9A7F2" onClick={() => go('flow-guide')} />
+          <div className="flex justify-between">
+            <EventBtn icon={<Droplets size={21} />} label="Periods" tint="#EE4D7B" bg="#E7E4FB" onClick={() => go('log-period', { date: selKey })} />
+            <EventBtn icon={<Heart size={21} />} label="Symptoms" tint="#E8875A" bg="#FDEAD7" onClick={() => go('log-symptoms', { date: selKey })} />
+            <EventBtn icon={<Egg size={21} />} label="Ovulation" tint="#EE4D7B" bg="#FDE3EE" onClick={() => go('insights')} />
+            <EventBtn icon={<BookOpen size={21} />} label="Flow Guide" tint="#5B8DEF" bg="#E0F0FA" onClick={() => go('flow-guide')} />
           </div>
 
           {/* selected day details */}
@@ -228,24 +238,26 @@ function Legend({ color, label, dot, ring, solid }: { color: string; label: stri
   return (
     <span className="inline-flex items-center gap-1.5">
       {dot ? (
-        <span className="w-[7px] h-[7px] rounded-full" style={{ background: color }} />
+        <span className="w-[8px] h-[8px] rounded-full" style={{ background: color }} />
       ) : ring ? (
-        <span className="w-[12px] h-[12px] rounded-full border border-dashed border-primary-light" style={{ background: color }} />
+        <span className="w-[12px] h-[12px] rounded-full border-2 bg-white" style={{ borderColor: color }} />
       ) : (
-        <span className="w-[12px] h-[12px] rounded-full" style={{ background: color }} />
+        <span className="w-[11px] h-[11px] rounded-[3.5px]" style={{ background: color }} />
       )}
       {label}
     </span>
   );
 }
 
-function EventBtn({ icon, label, tint, onClick }: { icon: React.ReactNode; label: string; tint: string; onClick: () => void }) {
+function EventBtn({ icon, label, tint, bg, onClick }: { icon: React.ReactNode; label: string; tint: string; bg: string; onClick: () => void }) {
   return (
-    <button onClick={onClick} className="tap flex flex-col items-center gap-1.5 w-[68px]">
-      <span className="w-[46px] h-[46px] rounded-full flex items-center justify-center" style={{ background: `${tint}1F`, color: tint }}>
-        {icon}
-      </span>
-      <span className="text-[10px] font-extrabold text-ink-soft text-center leading-tight">{label}</span>
+    <button
+      onClick={onClick}
+      className="tap w-[74px] h-[72px] rounded-[18px] flex flex-col items-center justify-center gap-1.5"
+      style={{ background: bg }}
+    >
+      <span style={{ color: tint }} className="flex items-center justify-center">{icon}</span>
+      <span className="text-[10.5px] font-extrabold text-ink text-center leading-tight">{label}</span>
     </button>
   );
 }

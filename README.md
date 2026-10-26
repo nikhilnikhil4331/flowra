@@ -26,7 +26,7 @@ Demo data is seeded after onboarding (history relative to today, so Home shows "
 - Tailwind CSS 3 (custom Myflo design system: Nunito + Great Vibes, blush palette, pink gradients)
 - Zustand with `localStorage` persistence
 - Lucide icons, date-fns
-- Original refined watercolor character illustrations in `public/images/`
+- Original watercolor mascot illustrations in `public/images/`
 
 ## Run locally
 

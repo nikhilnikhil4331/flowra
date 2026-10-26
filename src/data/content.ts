@@ -102,8 +102,17 @@ export const MOODS = [
   { id: 'calm', label: 'Calm', emoji: '😌' },
   { id: 'happy', label: 'Happy', emoji: '😊' },
   { id: 'anxious', label: 'Anxious', emoji: '😟' },
-  { id: 'sensitive', label: 'Sensitive', emoji: '🥺' },
   { id: 'sad', label: 'Sad', emoji: '😢' },
+  { id: 'depressed', label: 'Depressed', emoji: '😞' },
+  { id: 'confused', label: 'Confused', emoji: '🤔' },
+  { id: 'guilty', label: 'Guilty', emoji: '😔' },
+  { id: 'sleepy', label: 'Sleepy', emoji: '😴' },
+];
+
+/** includes legacy mood ids so older logs still display correctly */
+export const MOOD_ALL = [
+  ...MOODS,
+  { id: 'sensitive', label: 'Sensitive', emoji: '🥺' },
   { id: 'irritable', label: 'Irritable', emoji: '😤' },
 ];
 

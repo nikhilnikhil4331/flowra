@@ -8,7 +8,7 @@ export type ScreenId =
   | 'home' | 'calendar' | 'insights' | 'more'
   | 'log-period' | 'log-symptoms' | 'body-tracker'
   | 'food-scanner' | 'nutrition-result' | 'daily-nutrition'
-  | 'flow-color' | 'flow-guide' | 'delay-guide'
+  | 'flow-color' | 'flow-guide' | 'delay-guide' | 'cycle-history'
   | 'medicine' | 'add-medicine' | 'reminders' | 'reminder-detail'
   | 'ai' | 'reports' | 'settings';
 
@@ -38,6 +38,7 @@ export interface DayLog {
   energy: number;
   note?: string;
   noteTime?: string;
+  water?: number; // ml of water drank that day
 }
 
 export interface Meal {
@@ -115,7 +116,7 @@ export function seedDemoData() {
   offsets.forEach((off, i) => {
     for (let d = 0; d < durations[i]; d++) {
       dayLogs[toKey(add(t, off + d))] = {
-        mood: d === 0 ? 'sensitive' : d === 1 ? 'sad' : 'calm',
+        mood: d === 0 ? 'anxious' : d === 1 ? 'sad' : 'calm',
         symptoms: syms[i].map((s) => s.toLowerCase().replace(/ /g, '-')),
         pain: Math.max(1, painPattern[i] - d),
         bleeding: d === 0 ? 'Moderate' : d === 1 ? 'Heavy' : d === 2 ? 'Moderate' : 'Light',
@@ -126,12 +127,12 @@ export function seedDemoData() {
     }
     // a couple of mid-cycle logs
     dayLogs[toKey(add(t, off + 13))] = { mood: 'happy', symptoms: [], pain: 1, bloating: 2, stress: 3, energy: 8 };
-    dayLogs[toKey(add(t, off + 21))] = { mood: 'irritable', symptoms: ['acne', 'mood-swings'], pain: 2, bloating: 5, stress: 6, energy: 5 };
+    dayLogs[toKey(add(t, off + 21))] = { mood: 'confused', symptoms: ['acne', 'mood-swings'], pain: 2, bloating: 5, stress: 6, energy: 5 };
   });
 
   // today matches the reference "Day 1" story
   dayLogs[toKey(t)] = {
-    mood: 'sensitive',
+    mood: 'anxious',
     symptoms: ['cramps', 'bloating', 'headache'],
     pain: 6,
     bleeding: 'Moderate',

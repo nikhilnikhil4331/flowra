@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  ChevronLeft, ChevronRight, Plus, Home, CalendarDays, BarChart3, LayoutGrid,
+  ChevronLeft, ChevronRight, Plus, Home, CalendarDays, Sprout, Menu,
   Camera, Pill, Sparkles, Droplets, Activity, Heart, Wifi, BatteryMedium, X,
 } from 'lucide-react';
 import { useStore, ScreenId } from '../store';
@@ -332,7 +332,7 @@ export function MascotAvatar({ size = 40, ring = true }: { size?: number; ring?:
       className={`rounded-full overflow-hidden shrink-0 bg-primary-soft ${ring ? 'ring-2 ring-primary-soft' : ''}`}
       style={{ width: size, height: size }}
     >
-      <Mascot src="/images/woman-avatar.png" blend={false} className="w-full h-full object-cover" alt="Myflo" />
+      <Mascot src="/images/mascot-avatar.png" blend={false} className="w-full h-full object-cover" alt="Myflo" />
     </div>
   );
 }
@@ -364,22 +364,50 @@ export function DateStepper({
   );
 }
 
+/* --------------------------- floral line-art bg ---------------------------- */
+
+export function FloralBg() {
+  const Flower = ({ x, y, s, r }: { x: number; y: number; s: number; r: number }) => (
+    <g transform={`translate(${x} ${y}) rotate(${r}) scale(${s})`} fill="none" stroke="#F3C6D3" strokeWidth={1.1}>
+      {[0, 72, 144, 216, 288].map((a) => (
+        <ellipse key={a} cx={0} cy={-17} rx={8.5} ry={17} transform={`rotate(${a})`} />
+      ))}
+      <circle r={4} />
+      <path d="M22 14c10-2 16-10 18-20M-24 10c-10-4-14-12-15-22" />
+    </g>
+  );
+  return (
+    <svg
+      className="absolute inset-0 w-full h-full pointer-events-none opacity-70 z-0"
+      viewBox="0 0 400 820"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden
+    >
+      <Flower x={352} y={86} s={2.5} r={18} />
+      <Flower x={24} y={300} s={2} r={-12} />
+      <Flower x={372} y={520} s={1.6} r={38} />
+      <Flower x={44} y={690} s={1.3} r={6} />
+      <Flower x={330} y={760} s={1.9} r={-24} />
+    </svg>
+  );
+}
+
 /* -------------------------------- bottom nav -------------------------------- */
 
 const TABS: { id: ScreenId; label: string; Icon: typeof Home }[] = [
   { id: 'home', label: 'Home', Icon: Home },
   { id: 'calendar', label: 'Calendar', Icon: CalendarDays },
-  { id: 'insights', label: 'Insights', Icon: BarChart3 },
-  { id: 'more', label: 'More', Icon: LayoutGrid },
+  { id: 'insights', label: 'Insights', Icon: Sprout },
+  { id: 'more', label: 'More', Icon: Menu },
 ];
 
 export function BottomNav({ active }: { active: ScreenId }) {
   const tabTo = useStore((s) => s.tabTo);
   const setSheet = useStore((s) => s.setSheet);
   return (
-    <nav className="absolute bottom-0 inset-x-0 z-30 pointer-events-none" aria-label="Main">
-      <div className="relative mx-3 mb-3 bg-white/95 backdrop-blur rounded-[26px] shadow-card border border-blush-line pointer-events-auto">
-        <div className="grid grid-cols-5 items-end px-1 pt-1.5 pb-2">
+    <nav className="absolute bottom-0 inset-x-0 z-30" aria-label="Main">
+      <div className="relative bg-white rounded-t-[26px] border-t border-blush-line/80 shadow-[0_-8px_28px_rgba(242,91,138,0.08)]">
+        <div className="grid grid-cols-5 items-end px-2 pt-2 pb-[10px]">
           {TABS.slice(0, 2).map((t) => (
             <NavBtn key={t.id} {...t} active={active === t.id} onClick={() => tabTo(t.id)} />
           ))}
@@ -387,9 +415,9 @@ export function BottomNav({ active }: { active: ScreenId }) {
             <button
               onClick={() => setSheet(true)}
               aria-label="Quick add"
-              className="tap -mt-7 w-[52px] h-[52px] rounded-full bg-grad-pink shadow-fab border-4 border-white text-white flex items-center justify-center"
+              className="tap -mt-9 w-[56px] h-[56px] rounded-full bg-grad-pink shadow-fab border-[5px] border-[#FFF7F5] text-white flex items-center justify-center"
             >
-              <Plus size={26} strokeWidth={2.8} />
+              <Plus size={27} strokeWidth={2.6} />
             </button>
           </div>
           {TABS.slice(2).map((t) => (
@@ -406,11 +434,15 @@ function NavBtn({ label, Icon, active, onClick }: { label: string; Icon: typeof 
     <button
       onClick={onClick}
       aria-current={active ? 'page' : undefined}
-      className="tap flex flex-col items-center gap-[1px] py-0.5"
+      className="tap flex flex-col items-center gap-[2px] py-0.5"
     >
-      <Icon size={21} strokeWidth={active ? 2.6 : 2} className={active ? 'text-primary' : 'text-ink-faint'} />
-      <span className={`text-[9.5px] font-extrabold ${active ? 'text-primary' : 'text-ink-faint'}`}>{label}</span>
-      {active && <span className="w-1 h-1 rounded-full bg-primary" />}
+      <Icon
+        size={23}
+        strokeWidth={active ? 2.4 : 1.9}
+        className={active ? 'text-primary-dark' : 'text-[#A98E99]'}
+        fill={active && label === 'Home' ? '#EE4D7B' : 'none'}
+      />
+      <span className={`text-[10px] ${active ? 'font-extrabold text-primary-dark' : 'font-bold text-[#A98E99]'}`}>{label}</span>
     </button>
   );
 }
