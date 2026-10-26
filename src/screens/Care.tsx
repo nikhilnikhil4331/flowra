@@ -169,7 +169,7 @@ export function AddMedicine() {
 
   return (
     <div className="relative flex flex-col flex-1 min-h-0">
-      <Header title="Add Medicine" right={<Mascot src="/images/mascot-avatar.png" className="w-9 h-9 rounded-full object-cover" blend={false} alt="" />} />
+      <Header title="Add Medicine" right={<Mascot src="/images/woman-avatar.png" className="w-9 h-9 rounded-full object-cover" blend={false} alt="" />} />
       <ScreenScroll>
         <div className="px-5 pt-2 space-y-4">
           <Field label="Medicine Name">

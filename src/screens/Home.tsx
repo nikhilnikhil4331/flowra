@@ -69,7 +69,7 @@ export function Home() {
             </div>
             <div className="flex flex-col items-center gap-1 shrink-0">
               <div className="w-11 h-11 rounded-full overflow-hidden bg-primary-soft">
-                <Mascot src="/images/mascot-avatar.png" blend={false} className="w-full h-full object-cover" alt="" />
+                <Mascot src="/images/woman-avatar.png" blend={false} className="w-full h-full object-cover" alt="" />
               </div>
               <button onClick={() => go('log-period')} className="tap flex items-center gap-0.5 text-[9.5px] font-extrabold text-primary bg-primary-pale rounded-full px-2 py-[3px]">
                 <Plus size={10} strokeWidth={3.4} /> Log

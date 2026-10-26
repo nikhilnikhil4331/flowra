@@ -53,7 +53,7 @@ export function LogPeriod() {
       <Header title="Log Period" right={<CheckButton onClick={save} />} />
       <div className="relative px-5 -mt-1 flex items-end justify-between">
         <p className="text-[12px] font-semibold text-ink-mute pb-1">When did your period start & end?</p>
-        <Mascot src="/images/mascot-heart.png" className="h-[64px] w-auto" alt="" />
+        <Mascot src="/images/woman-heart.png" className="h-[64px] w-auto" alt="" />
       </div>
 
       <ScreenScroll>

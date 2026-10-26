@@ -16,7 +16,7 @@ function BackDot() {
 function AuthMascot() {
   return (
     <div className="flex justify-center -mb-1">
-      <Mascot src="/images/mascot-hello.png" alt="Myflo mascot" className="h-[104px] w-auto object-cover animate-floaty" />
+      <Mascot src="/images/woman-hello.png" alt="Myflo mascot" className="h-[104px] w-auto object-cover animate-floaty" />
     </div>
   );
 }

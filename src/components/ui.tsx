@@ -332,7 +332,7 @@ export function MascotAvatar({ size = 40, ring = true }: { size?: number; ring?:
       className={`rounded-full overflow-hidden shrink-0 bg-primary-soft ${ring ? 'ring-2 ring-primary-soft' : ''}`}
       style={{ width: size, height: size }}
     >
-      <Mascot src="/images/mascot-avatar.png" blend={false} className="w-full h-full object-cover" alt="Myflo" />
+      <Mascot src="/images/woman-avatar.png" blend={false} className="w-full h-full object-cover" alt="Myflo" />
     </div>
   );
 }
