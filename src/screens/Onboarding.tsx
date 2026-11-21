@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { ArrowRight, HeartPulse, Camera, BellRing, BarChart3 } from 'lucide-react';
 import { useStore } from '../store';
-import { resolveOnboardingCta, trackCtaStarted } from '../lib/experiment';
-import type { OnboardingCtaVariant } from '../lib/flagsmith';
+import {
+  forceVariantOverride,
+  resolveExperimentVariant,
+  trackConversionStarted,
+} from '../lib/experiment';
+import type { ExperimentVariant } from '../lib/flagsmith';
 import { StatusBar, PrimaryButton, Mascot, Petals, Dots, PetalShape } from '../components/ui';
 
 function SkipCorner({ page }: { page: number }) {
@@ -28,25 +32,31 @@ function Footer({ page, label, onNext }: { page: number; label: string; onNext: 
 
 export function Splash() {
   const go = useStore((s) => s.go);
-  const [variant, setVariant] = useState<OnboardingCtaVariant>('control');
+  // Dev builds only: ?variant=variant_a|variant_b force-overrides the flag.
+  // It exists purely so both variants can be recordable for the demo video —
+  // the real flag still resolves underneath. Demo-mode clicks are never
+  // reported to Flagsmith or Supabase, so the dashboard stays honest.
+  const forced = forceVariantOverride();
+  const [resolved, setResolved] = useState<ExperimentVariant>('variant_a');
 
-  // Resolve the experiment variant once per mount; the defaultFlags fallback
-  // renders control instantly, so the app is never waiting on Flagsmith.
   useEffect(() => {
     let cancelled = false;
-    resolveOnboardingCta().then((v) => {
-      if (!cancelled) setVariant(v);
+    resolveExperimentVariant().then((v) => {
+      if (!cancelled) setResolved(v);
     });
     return () => {
       cancelled = true;
     };
   }, []);
 
-  const ctaLabel =
-    variant === 'personalized' ? 'Start my cycle 🌸' : 'Get Started';
+  const variant: ExperimentVariant = forced ?? resolved;
+
+  const ctaLabel = variant === 'variant_b' ? 'Start my cycle 🌸' : 'Get Started';
+  const subLabel =
+    variant === 'variant_b' ? 'A gentle start to your routine' : 'Your story begins here';
 
   const handleStart = () => {
-    trackCtaStarted(variant);
+    if (!forced) trackConversionStarted(variant);
     go('onboard1');
   };
 
@@ -83,8 +93,13 @@ export function Splash() {
           {ctaLabel} <ArrowRight size={18} strokeWidth={2.8} />
         </PrimaryButton>
         <p className="text-center text-[10.5px] font-semibold text-ink-mute mt-3 tracking-wide">
-          {variant === 'personalized' ? 'A gentle start to your routine' : 'Your story begins here'}
+          {subLabel}
         </p>
+        {forced && (
+          <p className="text-center text-[9.5px] font-bold text-amber-600 mt-2 tracking-wide">
+            🧪 DEMO — forced {forced === 'variant_b' ? 'variant B' : 'variant A'} (not experiment data)
+          </p>
+        )}
       </div>
     </div>
   );

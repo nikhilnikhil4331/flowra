@@ -3,7 +3,7 @@ import { ChevronLeft, Eye, EyeOff, Check } from 'lucide-react';
 import { useStore } from '../store';
 import { GOALS } from '../data/content';
 import { PrimaryButton, Field, inputCls, Mascot, ScreenScroll } from '../components/ui';
-import { trackOnboardingCompleted } from '../lib/experiment';
+import { forceVariantOverride, trackConversionMetric } from '../lib/experiment';
 
 function BackDot() {
   const back = useStore((s) => s.back);
@@ -284,7 +284,9 @@ export function GoalsSetup() {
 
   const done = () => {
     completeOnboarding({ ...user, goals: sel.length ? sel : ['track'] });
-    trackOnboardingCompleted();
+    // Do not count demo-forced clicks toward the real experiment. The forced
+    // override is a dev-only tool; real users always track.
+    if (!forceVariantOverride()) trackConversionMetric();
     showToast('Welcome to Myflo! 🌸');
   };
 

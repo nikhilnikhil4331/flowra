@@ -5,7 +5,9 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
  *
  * The app itself stores its own data in the browser (Myflo is local-first by
  * design). Supabase is used for exactly one thing: durability for the A/B
- * funnel events, so a fresh install of the app can't invent a control.
+ * funnel events, so a fresh install of the app can't invent a control. The
+ * events mirror the Flagsmith funnel (started + conversion metric) so the
+ * funnel can be counted independently of Flagsmith's own dashboard.
  * Events are anonymous (a client-generated UUID is all we send) and the
  * table only allows inserts — read the funnel from the dashboard instead.
  */
