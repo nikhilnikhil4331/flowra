@@ -129,13 +129,15 @@ key = safe no-op.
 
 ## 04 · What we still need (the honest gap)
 
-The code is wired and the experiment is live-code. Missing are the two things
-only the project owner can do:
+**Done:** the SDK key is wired — `.env.local` and the Vercel project env vars
+(`VITE_FLAGSMITH_SDK_KEY`, all targets) carry the Flagsmith environment key and
+the production deploy ships it baked into the bundle.
 
-1. **The Flagsmith environment key** (`VITE_FLAGSMITH_SDK_KEY`) — paste it in
-   `.env.local` and/or in the Vercel project env vars, then redeploy.
-2. **The actual Flagsmith objects** — create the flag, metric and experiment in
-   the Flagsmith console (see §05).
+**Remaining — only the project owner can do:**
+
+1. **The actual Flagsmith objects** — create the flag, metric and experiment in
+   the Flagsmith console (see §05). Without them the SDK resolves nothing and
+   the app serves the control variant (`variant_a`).
 
 ## 05 · Runbook (what we still need)
 
