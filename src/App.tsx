@@ -1,6 +1,6 @@
 import React from 'react';
 import { useStore, useNav, ScreenId } from './store';
-import { StatusBar, QuickAddSheet, ToastView } from './components/ui';
+import { StatusBar, QuickAddSheet, ToastView, TourBar } from './components/ui';
 import { Splash, Onboard1, Onboard2, Onboard3 } from './screens/Onboarding';
 import { SignUp, Login, ProfileSetup, GoalsSetup } from './screens/Auth';
 import { Home } from './screens/Home';
@@ -53,10 +53,15 @@ export default function App() {
   const entry = useNav();
   const navDepth = useStore((s) => s.nav.length);
   const onboarded = useStore((s) => s.onboarded);
+  const tourMode = useStore((s) => s.tourMode);
 
   let screen = entry.screen;
-  if (onboarded && AUTH_SCREENS.includes(screen)) screen = 'home';
-  if (!onboarded && !AUTH_SCREENS.includes(screen)) screen = 'splash';
+  // In exploration mode the user/agent may jump straight to any screen —
+  // no onboarding gate. Data stays real; no demo data is fabricated.
+  if (!tourMode) {
+    if (onboarded && AUTH_SCREENS.includes(screen)) screen = 'home';
+    if (!onboarded && !AUTH_SCREENS.includes(screen)) screen = 'splash';
+  }
 
   const Screen = SCREENS[screen];
 
@@ -102,6 +107,7 @@ export default function App() {
         </div>
 
         <QuickAddSheet />
+        {tourMode && <TourBar />}
         <ToastView />
       </div>
     </div>

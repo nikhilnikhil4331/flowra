@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   ChevronLeft, ChevronRight, Plus, Home, CalendarDays, Sprout, Menu,
   Camera, Pill, Sparkles, Droplets, Activity, Heart, Wifi, BatteryMedium, X,
+  Compass, CalendarClock, BellRing, UtensilsCrossed, BarChart3, Settings,
 } from 'lucide-react';
 import { useStore, ScreenId } from '../store';
 
@@ -492,6 +493,67 @@ export function QuickAddSheet() {
             </button>
           ))}
         </div>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------ exploration ------------------------------ */
+
+const TOUR_SCREENS: { id: ScreenId; label: string; Icon: typeof Home }[] = [
+  { id: 'home', label: 'Home', Icon: Home },
+  { id: 'calendar', label: 'Calendar', Icon: CalendarDays },
+  { id: 'insights', label: 'Insights', Icon: Sprout },
+  { id: 'daily-nutrition', label: 'Nutrition', Icon: UtensilsCrossed },
+  { id: 'cycle-history', label: 'History', Icon: CalendarClock },
+  { id: 'medicine', label: 'Care', Icon: Pill },
+  { id: 'reminders', label: 'Reminders', Icon: BellRing },
+  { id: 'ai', label: 'AI', Icon: Sparkles },
+  { id: 'reports', label: 'Reports', Icon: BarChart3 },
+  { id: 'settings', label: 'Settings', Icon: Settings },
+];
+
+export function TourBar() {
+  const exitTour = useStore((s) => s.exitTour);
+  const tabTo = useStore((s) => s.tabTo);
+  const active = useStore((s) => s.nav[s.nav.length - 1]?.screen);
+  return (
+    <div
+      className="absolute left-2 right-2 bottom-[86px] z-40 rounded-[20px] border border-blush-line/80 bg-white/95 backdrop-blur-md shadow-phone animate-pop"
+      role="navigation"
+      aria-label="Exploration mode"
+    >
+      <div className="flex items-center justify-between pl-3 pr-2 pt-2">
+        <span className="text-[9px] font-black tracking-[0.16em] uppercase text-primary flex items-center gap-1.5">
+          <Compass size={12} strokeWidth={2.4} /> Exploration · tap a screen
+        </span>
+        <button
+          onClick={exitTour}
+          aria-label="Exit exploration mode"
+          className="tap flex items-center gap-1 text-[9.5px] font-extrabold text-ink-mute bg-blush-bg rounded-full px-2 py-1"
+        >
+          <X size={11} strokeWidth={2.6} /> Exit
+        </button>
+      </div>
+      <div className="flex gap-1.5 overflow-x-auto px-3 pb-2 pt-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {TOUR_SCREENS.map(({ id, label, Icon }) => {
+          const isActive = active === id;
+          return (
+            <button
+              key={id}
+              onClick={() => tabTo(id)}
+              aria-current={isActive ? 'page' : undefined}
+              className={`tap shrink-0 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-extrabold border ${
+                isActive
+                  ? 'bg-grad-pink text-white border-transparent shadow-btn'
+                  : 'bg-primary-pale text-primary border-primary-soft/50'
+              }`}
+            >
+              <Icon size={13} strokeWidth={2.3} />
+              {label}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

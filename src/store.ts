@@ -186,6 +186,7 @@ interface State {
   nav: NavEntry[];
   sheetOpen: boolean;
   toast: string | null;
+  tourMode: boolean;
 
   go: (screen: ScreenId, params?: Record<string, unknown>) => void;
   back: () => void;
@@ -193,6 +194,8 @@ interface State {
   replace: (screen: ScreenId, params?: Record<string, unknown>) => void;
   setSheet: (open: boolean) => void;
   showToast: (msg: string) => void;
+  enterTour: () => void;
+  exitTour: () => void;
 
   completeOnboarding: (user: UserProfile) => void;
   setUser: (patch: Partial<UserProfile>) => void;
@@ -227,6 +230,10 @@ export const useStore = create<State>()(
       nav: [{ screen: 'splash' }],
       sheetOpen: false,
       toast: null,
+      tourMode: false,
+
+      enterTour: () => set({ tourMode: true, sheetOpen: false }),
+      exitTour: () => set({ tourMode: false }),
 
       go: (screen, params) => set((s) => ({ nav: [...s.nav, { screen, params }], sheetOpen: false })),
       back: () => set((s) => ({ nav: s.nav.length > 1 ? s.nav.slice(0, -1) : s.nav })),
@@ -265,11 +272,17 @@ export const useStore = create<State>()(
       pushChat: (role, text) => set((s) => ({ chat: [...s.chat, { id: uid(), role, text }] })),
 
       logout: () => set({ onboarded: false, nav: [{ screen: 'login' }] }),
-      resetAll: () =>
+      resetAll: () => {
+        // Rotate the anonymous funnel identity so a brand-new user is counted
+        // as genuinely new (no stale funnel history). The next visit generates
+        // a fresh UUID through the normal init path — no funnel events fire here.
+        try { localStorage.removeItem('myflo-client-id-v1'); } catch { /* private mode */ }
         set({
           onboarded: false, user: blankUser, periods: [], dayLogs: {}, meals: [],
           medicines: [], reminders: [], chat: [], seeded: false, nav: [{ screen: 'splash' }],
-        }),
+          toast: null, sheetOpen: false, tourMode: false,
+        });
+      },
     }),
     {
       name: 'myflo-store-v1',

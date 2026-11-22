@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   User, SlidersHorizontal, BellRing, Bell, ShieldCheck, Languages, LifeBuoy,
   Star, Info, ChevronRight, ChevronDown, Database, CalendarClock, Minus, Plus, Download, Trash2,
+  Compass,
 } from 'lucide-react';
 import { useStore } from '../store';
 import {
@@ -114,6 +115,7 @@ export function Settings() {
   const go = useStore((s) => s.go);
   const showToast = useStore((s) => s.showToast);
   const resetAll = useStore((s) => s.resetAll);
+  const enterTour = useStore((s) => s.enterTour);
 
   const [open, setOpen] = useState<string | null>(null);
   const toggleSection = (id: string) => setOpen(open === id ? null : id);
@@ -250,12 +252,33 @@ export function Settings() {
                   </button>
                   <button
                     onClick={() => {
-                      if (confirmWipe) { resetAll(); showToast('All data deleted'); }
-                      else setConfirmWipe(true);
+                      if (!confirmWipe) { setConfirmWipe(true); return; }
+                      resetAll(); // wipes app data + the anonymous funnel identity
+                      showToast('All data deleted — starting fresh');
+                      setTimeout(() => window.location.reload(), 700);
                     }}
                     className="tap w-full h-11 rounded-full bg-red-50 text-red-500 text-[12.5px] font-extrabold flex items-center justify-center gap-2"
                   >
                     <Trash2 size={15} /> {confirmWipe ? 'Tap again to delete everything' : 'Delete all my data'}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Exploration */}
+            <div>
+              <Row Icon={Compass} label="Exploration mode" open={open === 'explore'} onClick={() => toggleSection('explore')} />
+              {open === 'explore' && (
+                <div className="px-4 pb-4 space-y-3 animate-fade-in">
+                  <p className="text-[11.5px] font-semibold text-ink-mute leading-relaxed">
+                    Walk the app freely — tap any screen to jump straight to it. For AI agents, demos and walkthroughs.
+                    No data is fabricated — screens show real data only.
+                  </p>
+                  <button
+                    onClick={enterTour}
+                    className="tap w-full h-11 rounded-full bg-grad-pink text-white text-[12.5px] font-extrabold flex items-center justify-center gap-2 shadow-btn"
+                  >
+                    <Compass size={15} strokeWidth={2.4} /> Enter exploration mode
                   </button>
                 </div>
               )}
