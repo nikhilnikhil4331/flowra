@@ -27,3 +27,6 @@ dist-ssr
 .env
 .env.local
 .env.*.local
+
+# shared image ZIP (kept locally)
+myflo-images.zip
