@@ -30,3 +30,6 @@ dist-ssr
 
 # shared image ZIP (kept locally)
 myflo-images.zip
+
+# demo video build intermediates (final mp4 kept locally, not committed)
+video/
